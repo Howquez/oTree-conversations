@@ -4,7 +4,7 @@ SESSION_CONFIGS = [
     dict(
         name='voice',
         app_sequence=['voice'],
-        num_demo_participants=1,
+        num_demo_participants=3,
     ),
 ]
 
@@ -14,7 +14,10 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, participation_fee=0.00, doc=""
+    real_world_currency_per_point=1.00, participation_fee=0.00, doc="",
+    rerecord=True,
+    listen=True,
+    transcript=True,
 )
 
 PARTICIPANT_FIELDS = []

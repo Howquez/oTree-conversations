@@ -1,25 +1,78 @@
-# oTree Whisper API 
+# oTree Whisper API
 
-This is a simple app that demonstrates Open AI's [Whisper API](https://openai.com/index/whisper/) for [oTree](https://www.otree.org/). Please feel free to leave any feedback or open an issue if you spot a problem. I have only tested this in Windows 11 using Chrome.
+This is an oTree app that integrates OpenAI's [Whisper API](https://openai.com/index/whisper/) for voice transcription in behavioral experiments. It is a fork of [clintmckenna/oTree-Whisper](https://github.com/clintmckenna/oTree-Whisper) with additional features for production use.
 
-## Recording and Translation
-The Start button will trigger a recording. Using oTree Live Pages function, the Stop button will save the base64 and webm file, and run this through Whisper. 
+## Features
 
-<img src="https://raw.githubusercontent.com/clintmckenna/oTree-Whisper/master/screenshot.png" alt="screenshot" width="500"/>
+### Voice Recording & Transcription
+- Floating pill-style recorder that stays at the bottom of the screen
+- Record, re-record, and playback controls
+- Real-time transcription via Whisper API
+- Async live methods to prevent server blocking with multiple participants
 
-Update: for security and data concerns, Chris from oTree has advised to not save audio files directly to the server. I have updated the app to write to an Amazon S3 bucket. The base64 data is able to be passed directly to Whisper API via the requests package. The base64 text and transcript are saved to the player variables, so you can always recreate the audio samples if needed.
+### Consent Page
+- GDPR-compliant consent flow
+- Microphone permission request before the experiment begins
+- Privacy policy integration
 
-## API key
-To use this, you will need to acquire a key from [OpenAI's API](https://openai.com/product). Add this as an environment variable to your local environment or you can just paste it into the code. If you use Amazon S3 to save the audio samples, you will need to add these as well.
+### Onboarding Tutorial
+- Step-by-step walkthrough explaining the recorder interface
+- Test recording with a sample phrase ("The cat is black")
+- Audio quality verification before proceeding
+- Transcript display to confirm recording works
 
-## Package requirements
-When using locally, you will also need to install the boto3 Python package if you plan to save the files to Amazon S3. Be sure to add these to your requrements.txt file before using online.
+### UI/UX
+- Bootstrap placeholder animations while processing
+- Responsive design for mobile devices
+- Clean, modern interface
+
+## Setup
+
+### Requirements
+Install the required packages:
+```bash
+pip install -r requirements.txt
+```
+
+### Environment Variables
+You will need the following environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `WHISPER_KEY` | OpenAI API key for Whisper transcription |
+| `S3_ACCESS_KEY` | AWS access key for S3 storage (optional) |
+| `S3_SECRET_KEY` | AWS secret key for S3 storage (optional) |
+
+You can set these in a `.env` file in the project root.
+
+### API Keys
+- Get an OpenAI API key from [OpenAI's API](https://openai.com/product)
+- If using Amazon S3 for audio storage, configure your AWS credentials
+
+## File Structure
+
+```
+voice/
+├── __init__.py          # Page classes and live methods
+├── consent.html         # Consent and microphone permission
+├── onboarding.html      # Tutorial and audio test
+├── record.html          # Main recording page
+├── privacy.html         # Privacy policy template
+└── static/
+    ├── css/
+    │   ├── record.css       # Recorder styles
+    │   └── onboarding.css   # Tutorial overlay styles
+    └── js/
+        ├── record.js        # Recording functionality
+        └── onboarding.js    # Tutorial logic
+```
 
 ## Citation
-As part of oTree's [installation agreement](https://otree.readthedocs.io/en/master/install.html), be sure to cite their paper: 
+
+As part of oTree's [installation agreement](https://otree.readthedocs.io/en/master/install.html), please cite:
 
 - Chen, D.L., Schonger, M., Wickens, C., 2016. oTree - An open-source platform for laboratory, online and field experiments. Journal of Behavioral and Experimental Finance, vol 9: 88-97.
 
-If this app was helpful, you may consider citing this github repository as well.
+For the original Whisper integration:
 
 - McKenna, C., (2024). oTree Whisper. https://github.com/clintmckenna/oTree-Whisper

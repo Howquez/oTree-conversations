@@ -1,0 +1,125 @@
+/* Onboarding overlay */
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    transition: opacity 0.3s ease;
+}
+
+.onboarding-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Onboarding tooltip */
+.onboarding-tooltip {
+    position: fixed;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 1002;
+    transition: all 0.3s ease;
+}
+
+.onboarding-tooltip.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+}
+
+.onboarding-step-indicator {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.onboarding-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.onboarding-content {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.onboarding-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.onboarding-nav .btn {
+    flex: 1;
+}
+
+/* Highlight effect for targeted elements */
+.onboarding-highlight {
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+}
+
+.onboarding-highlight-pill {
+    z-index: 1001;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+.onboarding-highlight-card {
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+    border-radius: 8px;
+}
+
+/* Tooltip arrow */
+.onboarding-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    transform: rotate(45deg);
+}
+
+.onboarding-tooltip.arrow-bottom::before {
+    bottom: -6px;
+    left: 50%;
+    margin-left: -6px;
+}
+
+.onboarding-tooltip.arrow-top::before {
+    top: -6px;
+    left: 50%;
+    margin-left: -6px;
+}
+
+/* Completion message */
+.onboarding-complete {
+    text-align: center;
+}
+
+.onboarding-complete-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .onboarding-tooltip {
+        max-width: calc(100% - 32px);
+        left: 16px !important;
+        right: 16px;
+    }
+}

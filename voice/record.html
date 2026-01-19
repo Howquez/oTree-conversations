@@ -1,132 +1,89 @@
-{{ block title }}
-    Whisper API Transcription Example
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/record.css' }}">
 {{ endblock }}
 
 {{ block scripts }}
-
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.997.0.min.js"></script>
-
-<script>
-    const startButton = document.getElementById('start');
-    const stopButton = document.getElementById('stop');
-    const playButton = document.getElementById('play');
-    let output = document.getElementById('output');
-    let audioRecorder;
-    let audioChunks = [];
-
-    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        .then(stream => {
-
-            const options = {mimeType: 'video/webm; codecs=opus'}
-
-            // Initialize the media recorder object
-            audioRecorder = new MediaRecorder(stream, options);
-
-            // dataavailable event is fired when the recording is stopped
-            audioRecorder.addEventListener('dataavailable', e => {
-                audioChunks.push(e.data);
-            });
-
-            // start recording when the start button is clicked
-            startButton.addEventListener('click', () => {
-                audioChunks = [];
-                audioRecorder.start();
-                output.innerHTML = 'Recording started! Speak now.';
-            });
-
-            // stop recording when the stop button is clicked
-            stopButton.addEventListener('click', () => {
-                audioRecorder.stop();
-                output.innerHTML = 'Recording stopped! <br><br>';
-
-                // Convert audio chunks to Blob
-                const blobObj = new Blob(audioChunks, { type: 'video/webm' });
-
-                audioRecorder.ondataavailable = (e) => {
-                    // Converting audio blob to base64 and livesend
-                    let reader = new FileReader()
-                    reader.onloadend = () => {
-                        base64 = reader.result;
-                        base64 = base64.split(',')[1];
-                        liveSend({'text': base64});
-                    }
-
-                    reader.readAsDataURL(e.data);
-                }
-            });
-
-        }).catch(err => {
-            // If the user denies permission to record audio, then display an error.
-            console.log('Error: ' + err);
-        });
-
-</script>
-
-<script>
-    // specify divs
-    const div_transcript = document.getElementById("id_transcript");
-
-    function liveRecv(data) {
-
-        // transcript text
-        const transcript = data["text"];
-
-        if (transcript) {
-            // update div only if transcript is available
-            div_transcript.innerHTML = `<b>Transcript:</b><br>` + transcript;
-
-        } else {
-            // placeholder if transcript is not yet available
-            div_transcript.innerHTML = "Transcript processing...";
-        }
-
-
-
-    }
-
-    document.addEventListener("DOMContentLoaded", function (event) {
-        liveSend({});
-    });
-    
-</script>
-
-
-
-{{ endblock }}
-
-{{ block styles}}
-<style>
-    .btn {margin: 5px; padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;}
-    .btn:hover {background-color: #0056b3; color: #fff;}
-    div { margin-top: 20px;}
-
-</style>
-  
-
-
+<script src="{{ static 'js/record.js' }}"></script>
 {{ endblock }}
 
 {{ block content }}
-        
-    <button type = 'button' id = 'start' class="btn">
-        Start Recording
-    </button>
-    <button type = 'button' id = 'stop' class="btn">
-        Stop Recording
-    </button>
-    
-    <br><br>
-    Press "Start Recording" and try saying some words:
-    <br>
-    
-    <div id="output"></div>
-    <div id="id_transcript"></div>
 
-    <div style="text-align: center;">
-        <br>
-        {{ next_button }}
+<h1 class="display-4"> Whisper API</h1>
+
+<p>Use the voice recorder below to record your response:</p>
+
+<!-- Content placeholder area (can hold text, images, or other content) -->
+<div id="content-placeholder-container" class="content-placeholder-container">
+    <div id="content-placeholder" class="placeholder-glow">
+        <div class="placeholder-img placeholder col-12 mb-3"></div>
+        <span class="placeholder col-6"></span>
+        <span class="placeholder col-8"></span>
+        <span class="placeholder col-4"></span>
     </div>
-    
+    <!-- Actual content goes here (hidden initially) -->
+    <div id="content-area" style="display: none;"></div>
+</div>
 
+<div class="transcript-container">
+    <div class="transcript-label">Transcript</div>
+    <!-- Placeholder shown before transcript is ready -->
+    <div id="transcript-placeholder" class="placeholder-glow">
+        <span class="placeholder col-7"></span>
+        <span class="placeholder col-4"></span>
+        <span class="placeholder col-5"></span>
+    </div>
+    <!-- Actual transcript (hidden initially) -->
+    <div id="id_transcript" class="transcript-text" style="display: none;"></div>
+</div>
+
+<div class="pill-spacer"></div>
+
+<!-- Floating Voice Recorder Pill -->
+<div class="voice-pill">
+    <div class="recording-indicator" id="recording-indicator"></div>
+    <span class="status-text" id="status-text">Ready to record</span>
+
+    <!-- Record / Stop button -->
+    <button type="button" class="pill-btn record-btn" id="record-toggle" title="Start recording">
+        <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <svg id="stop-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+        </svg>
+    </button>
+
+    <!-- Re-record button -->
+    <button type="button" class="pill-btn" id="rerecord-btn" title="Re-record" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 4v6h6"/>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+    </button>
+
+    <!-- Play button -->
+    <button type="button" class="pill-btn" id="play-btn" title="Play recording" disabled>
+        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"/>
+            <rect x="14" y="4" width="4" height="16"/>
+        </svg>
+    </button>
+
+    <!-- Next/Submit button -->
+    <button type="submit" class="pill-btn next-btn" id="submit_button" title="Next" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"/>
+            <path d="M12 5l7 7-7 7"/>
+        </svg>
+    </button>
+</div>
+
+<audio id="audio-playback"></audio>
 
 {{ endblock }}
