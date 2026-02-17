@@ -63,7 +63,7 @@ voice/
     │   ├── record.css       # Recorder styles
     │   └── onboarding.css   # Tutorial overlay styles
     └── js/
-        ├── record.js        # Recording functionality
+        ├── chat.js        # Recording functionality
         └── onboarding.js    # Tutorial logic
 ```
 

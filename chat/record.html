@@ -1,0 +1,86 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/record.css' }}">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="chat-container">
+    <h1 class="chat-title">Voice Conversation</h1>
+
+    <div class="instructions" id="instructions">
+        <p>You'll have a short voice conversation with an AI assistant.</p>
+        <p>Click the microphone button below to start, then say "Hello" to begin the conversation.</p>
+    </div>
+
+    <!-- Status indicator (shown when connected) -->
+    <div class="connection-status" id="connection-status" style="display: none;">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-label">Listening...</span>
+    </div>
+
+    <!-- Product comparison (hidden until tool call) -->
+    <div class="product-comparison-wrapper" id="product-comparison" style="display: none;">
+        <div class="row row-cols-2 g-5 justify-content-center product-comparison">
+            <div class="col card-item">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body" id="product_a">
+                        <h6><small>Coca-Cola Soft Drink</small></h6>
+                        <h5>Diet Coke</h5>
+                        <p class="text-muted mb-2">12 fl oz Can</p>
+                        <img src="https://kentstreetcellars.com.au/cdn/shop/files/diet-coke-can_b987ca3b-bed6-49b1-976e-13b9ac3ccb32_1000x1000.png?v=1687839956" class="card-img-top" alt="Diet Coke">
+                        <p class="price">$1.50</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col card-item">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body" id="product_b">
+                        <h6><small>Coca-Cola Soft Drink</small></h6>
+                        <h5>Coke Zero Sugar</h5>
+                        <p class="text-muted mb-2">12 fl oz Can</p>
+                        <img src="https://kentstreetcellars.com.au/cdn/shop/files/zero-sugar-cans_4f0d125e-5bf1-4b57-b376-f23814d758e3_1000x1000.png?v=1687839908" class="card-img-top" alt="Coke Zero">
+                        <p class="price">$2.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="chat_log" id="id_chat_log" value="">
+
+<!-- Hidden chat log for data storage -->
+<div id="chat-messages" style="display: none;"></div>
+
+<div class="pill-spacer"></div>
+
+<!-- Floating Voice Pill -->
+<div class="voice-pill">
+    <div class="recording-indicator" id="recording-indicator"></div>
+    <span class="status-text" id="status-text">Ready</span>
+
+    <!-- Connect / Disconnect button -->
+    <button type="button" class="pill-btn connect-btn" id="connect-btn" title="Start conversation">
+        <svg id="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <svg id="disconnect-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+        </svg>
+    </button>
+
+    <!-- Next/Submit button -->
+    <button type="submit" class="pill-btn next-btn" id="submit_button" title="Finish" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"/>
+            <path d="M12 5l7 7-7 7"/>
+        </svg>
+    </button>
+</div>
+
+<script src="{{ static 'js/chat.js' }}"></script>
+
+{{ endblock }}

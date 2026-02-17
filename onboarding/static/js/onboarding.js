@@ -233,6 +233,7 @@ function updateContinueButton() {
 
 // Handle transcript from server
 function liveRecv(data) {
+    console.log("liveRecv data:", JSON.stringify(data));
     const transcript = data["text"];
     transcriptPlaceholder.style.display = 'none';
     if (transcript) {

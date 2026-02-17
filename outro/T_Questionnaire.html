@@ -1,0 +1,32 @@
+
+
+                        <table class="table mt-4">
+                            <colgroup>
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                               <col span="1">
+                            </colgroup>
+                            <tr>
+                                <td></td>
+                                <td colspan="3"><small>Strongly<br>disagree</small></td>
+                                <td></td>
+                                <td colspan="3" class="text-end"><small>Strongly<br>agree</small></td>
+                            </tr>
+                            {{ for field in form }}
+                                <tr>
+                                    <td>
+                                        <small>{{ field.label }}</small>
+                                    </td>
+                                    {{ for choice in field }}
+                                        <td>
+                                            <small>{{ choice }}</small>
+                                        </td>
+                                    {{ endfor }}
+                                </tr>
+                            {{ endfor }}
+                        </table>

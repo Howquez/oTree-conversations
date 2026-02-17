@@ -137,6 +137,7 @@ function showPauseIcon() {
 
 // Handle transcript updates
 function liveRecv(data) {
+    console.log("liveRecv data:", JSON.stringify(data));
     const transcript = data["text"];
     if (transcript) {
         // Hide placeholder, show transcript

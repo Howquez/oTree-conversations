@@ -1,0 +1,68 @@
+{{ block content }}
+
+<!-- Debriefing Card -->
+<div class="card mt-5 shadow-lg">
+    <div class="card-body">
+        <h1 class="display-4">Thank you!</h1>
+        <p class="lead">Your participation is greatly appreciated.</p>
+
+        <table class="table mt-5 mb-5 table-responsive">
+            <tbody>
+                <tr>
+                    <th scope="row">Your Voice Recording</th>
+                    <td class="text-secondary">
+                        <small>
+                            Your voice recording has been securely stored and will only be used for the purposes
+                            described in the privacy policy. The recording is linked only to your anonymous participant
+                            code, not to any personal information.
+                            <br><br>
+                            <strong>To request deletion of your voice recording</strong>, send an email to the address
+                            below and include your participant code: <code>{{ participant.code }}</code>.
+                            We will delete your recording within 30 days of receiving your request.
+                        </small>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Confidentiality</th>
+                    <td class="text-secondary">
+                        <small>
+                            Please do not disclose research procedures to anyone who might participate in this study in
+                            the future as this could affect the results of the study.
+                        </small>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Final Report</th>
+                    <td class="text-secondary">
+                        <small>
+                            If you would like to receive a copy of the final report of this study
+                            (or a summary of the findings) when it is completed, please feel free to contact us.
+                        </small>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Contact Information</th>
+                    <td class="text-secondary">
+                        <small>
+                            If you have any questions or concerns regarding this study, its purpose or procedures, or if
+                            you have a research-related problem, please feel free to contact the researcher,
+                            Mr. Hauke Roggenkamp, via email:
+                            <a href="mailto:hauke.roggenkamp@mtec.ethz.ch?subject=Decision articulation study: {{ participant.code }}">
+                                hauke.roggenkamp@mtec.ethz.ch
+                            </a>.
+                            <br><br>
+                            Please include your participant code in any correspondence: <code>{{ participant.code }}</code>
+                        </small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="text-center text-secondary mb-4">
+            <a class="btn btn-success shadow" href="" role="button">
+                Click here to complete the survey
+            </a>
+        </p>
+    </div>
+</div>
+
+{{ endblock }}

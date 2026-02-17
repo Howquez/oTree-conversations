@@ -15,9 +15,7 @@ voice transcription with whisper api
 class C(BaseConstants):
     NAME_IN_URL = 'voice'
     PLAYERS_PER_GROUP = None
-    NUM_ROUNDS = 3
-    PRIVACY_TEMPLATE = "voice/privacy.html"
-
+    NUM_ROUNDS = 1
 
 
 class Subsession(BaseSubsession):
@@ -33,51 +31,10 @@ class Player(BasePlayer):
 
 
 # PAGES
-class consent(Page):
-    form_model = 'player'
-    @staticmethod
-    def is_displayed(player):
-        return player.round_number == 1
-
-class onboarding(Page):
-    form_model = 'player'
-
-    @staticmethod
-    def is_displayed(player):
-        return player.round_number == 1
-
-    @staticmethod
-    async def live_method(player: Player, data):
-        # Transcribe test recording (no S3 upload for onboarding)
-        if 'audio' in data:
-            audio_data = data['audio']
-            b64 = base64.b64decode(audio_data)
-
-            output = {"text": ""}
-            try:
-                OPENAI_KEY = os.environ.get('WHISPER_KEY')
-
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(
-                        'https://api.openai.com/v1/audio/transcriptions',
-                        headers={'Authorization': f'Bearer {OPENAI_KEY}'},
-                        files={"file": ("test.webm", b64, "audio/webm")},
-                        data={'model': 'whisper-1'}
-                    )
-
-                output = response.json()
-                print(f"Onboarding transcript: {output.get('text', '')}")
-
-            except Exception as e:
-                print("Error transcribing onboarding audio:", e)
-
-            yield {player.id_in_group: output}
-
-
 class record(Page):
     form_model = 'player'
     form_fields = ['base64']
-    
+
     @staticmethod
     async def live_method(player: Player, data):
 
@@ -133,7 +90,5 @@ class record(Page):
             yield {player.id_in_group: output}
 
 page_sequence = [
-    consent,
-    onboarding,
     record,
 ]

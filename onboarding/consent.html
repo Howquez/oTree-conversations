@@ -1,0 +1,169 @@
+{{ block styles }}
+<style>
+    #mic-icon {
+        font-weight: bold;
+    }
+    #mic-icon.granted {
+        color: #22c55e;
+    }
+    #mic-icon.denied {
+        color: #ef4444;
+    }
+    #mic-icon.pending {
+        color: #f59e0b;
+    }
+    #micPermission:disabled {
+        opacity: 0.6;
+    }
+</style>
+{{ endblock }}
+
+{{ block scripts }}
+<script>
+    const micToggle = document.getElementById('micPermission');
+    const micStatus = document.getElementById('mic-status');
+    const micIcon = document.getElementById('mic-icon');
+
+    // Check existing permission status on load
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'microphone' }).then(result => {
+            updatePermissionStatus(result.state);
+            result.onchange = () => updatePermissionStatus(result.state);
+        }).catch(() => {
+            // Permissions API not supported, wait for user action
+        });
+    }
+
+    micToggle.addEventListener('change', async function() {
+        if (this.checked) {
+            try {
+                micStatus.textContent = 'Requesting access...';
+                micIcon.textContent = '';
+                micIcon.className = 'ms-2 pending';
+
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Permission granted - stop the stream immediately (we just needed permission)
+                stream.getTracks().forEach(track => track.stop());
+
+                updatePermissionStatus('granted');
+            } catch (err) {
+                console.log('Microphone permission denied:', err);
+                updatePermissionStatus('denied');
+                this.checked = false;
+            }
+        }
+    });
+
+    function updatePermissionStatus(state) {
+        micIcon.className = 'ms-2 ' + state;
+
+        if (state === 'granted') {
+            micStatus.textContent = 'Microphone access granted';
+            micIcon.textContent = '\u2713';
+            micToggle.checked = true;
+            micToggle.disabled = true;
+        } else if (state === 'denied') {
+            micStatus.textContent = 'Microphone access denied - please enable in browser settings';
+            micIcon.textContent = '\u2717';
+            micToggle.checked = false;
+        } else {
+            micStatus.textContent = 'Click to enable microphone access';
+            micIcon.textContent = '';
+        }
+    }
+</script>
+{{ endblock }}
+
+{{ block content }}
+<body class="bg-light.bg-gradient">
+    <!-- Hidden inputs for web tracking-->
+    <input type="hidden" name="width" id="width">
+    <input type="hidden" name="height" id="height">
+    <input type="hidden" name="device_pixel_ratio" id="device_pixel_ratio">
+
+    <!-- Decision Card -->
+    <div class="card mt-5 shadow-lg">
+        <div class="card-body">
+            <h1 class="display-4">Welcome!</h1>
+            <p class="lead">Thank you for your interest in this study.</p>
+            <div id="card_body">
+                <table class="table mt-5 mb-5 table-responsive">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Study</th>
+                            <td>Decision articulation study</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Institution</th>
+                            <td>ETH Zurich</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Duration</th>
+                            <td>
+                                Approximately 10 minutes.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Technical Requirements</th>
+                            <td>
+                                We will ask you to provide a voice input. For that reason,
+                                <u class=""> we require you to use a device with a microphone in a quiet and private place</u>.
+                                For the smoothest possible process, we advise using a modern browser other than Safari with a stable
+                                Internet connection.
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="micPermission" required>
+                                    <label class="form-check-label" for="micPermission">
+                                        <span id="mic-status">Click to enable microphone access</span>
+                                        <span id="mic-icon" class="ms-2"></span>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                Privacy
+                            </th>
+                            <td>
+                                <p class="mb-2">
+                                    Your privacy is important to us. Since this study involves voice recordings, please read the
+                                    <a class="text-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasGDPR" id="gdpr_text" style="cursor: pointer;">
+                                        <u>privacy policy</u>
+                                    </a>
+                                    carefully before accepting.
+                                </p>
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="GDPR" required>
+                                    <label class="form-check-label" for="GDPR">
+                                        I have read and agree to the privacy policy
+                                        regarding the anonymized analysis of my answers for scientific evaluation.
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center m-5">
+                    <button class="btn btn-primary shadow" type="submit" id="submitButton">
+                        Proceed to study
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GDPR Offcanvas-->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasGDPR" aria-labelledby="offcanvasGDPRLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasGDPRLabel">Privacy Policy</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+
+            {{ include C.PRIVACY_TEMPLATE }}
+
+        </div>
+    </div>
+</body>
+{{ endblock }}

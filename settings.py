@@ -1,9 +1,14 @@
 from os import environ
 
 SESSION_CONFIGS = [
+    # dict(
+    #     name='voice_decision',
+    #     app_sequence=['onboarding', 'voice', 'outro'],
+    #     num_demo_participants=3,
+    # ),
     dict(
-        name='voice',
-        app_sequence=['voice'],
+        name='voice_chat',
+        app_sequence=['chat', 'outro'],
         num_demo_participants=3,
     ),
 ]

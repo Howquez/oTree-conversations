@@ -8,31 +8,48 @@
 
 {{ block content }}
 
-<h1 class="display-4"> Whisper API</h1>
+<h1 class="display-4">Which would you choose?</h1>
 
-<p>Use the voice recorder below to record your response:</p>
+<p class="question-text">Please record your preference and explain why you would choose one over the other.</p>
 
-<!-- Content placeholder area (can hold text, images, or other content) -->
-<div id="content-placeholder-container" class="content-placeholder-container">
-    <div id="content-placeholder" class="placeholder-glow">
-        <div class="placeholder-img placeholder col-12 mb-3"></div>
-        <span class="placeholder col-6"></span>
-        <span class="placeholder col-8"></span>
-        <span class="placeholder col-4"></span>
+<!-- Product comparison -->
+<div class="row row-cols-2 g-5 justify-content-center product-comparison">
+    <div class="col card-item">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body" id="product_a">
+                <h6>
+                    <small>Coca-Cola Soft Drink</small>
+                </h6>
+                <h5>Diet Coke</h5>
+                <p class="text-muted mb-2">12 fl oz Can</p>
+                <img src="https://kentstreetcellars.com.au/cdn/shop/files/diet-coke-can_b987ca3b-bed6-49b1-976e-13b9ac3ccb32_1000x1000.png?v=1687839956" class="card-img-top" alt="Diet Coke">
+                <p class="price">$1.50</p>
+            </div>
+        </div>
     </div>
-    <!-- Actual content goes here (hidden initially) -->
-    <div id="content-area" style="display: none;"></div>
+
+    <div class="col card-item">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body" id="product_b">
+                <h6>
+                    <small>Coca-Cola Soft Drink</small>
+                </h6>
+                <h5>Coke Zero Sugar</h5>
+                <p class="text-muted mb-2">12 fl oz Can</p>
+                <img src="https://kentstreetcellars.com.au/cdn/shop/files/zero-sugar-cans_4f0d125e-5bf1-4b57-b376-f23814d758e3_1000x1000.png?v=1687839908" class="card-img-top" alt="Coke Zero">
+                 <p class="price">$2.00</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="transcript-container">
-    <div class="transcript-label">Transcript</div>
-    <!-- Placeholder shown before transcript is ready -->
+    <div class="transcript-label">Your Response</div>
     <div id="transcript-placeholder" class="placeholder-glow">
         <span class="placeholder col-7"></span>
         <span class="placeholder col-4"></span>
         <span class="placeholder col-5"></span>
     </div>
-    <!-- Actual transcript (hidden initially) -->
     <div id="id_transcript" class="transcript-text" style="display: none;"></div>
 </div>
 
