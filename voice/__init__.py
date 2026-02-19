@@ -28,12 +28,16 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     base64 = models.LongStringField(blank=True)
     transcript = models.LongStringField(blank=True)
+    image_shown = models.IntegerField(initial=0)
+    screen_width = models.IntegerField(blank=True)
+    screen_height = models.IntegerField(blank=True)
+    touch_capable = models.IntegerField(initial=0)
 
 
 # PAGES
 class record(Page):
     form_model = 'player'
-    form_fields = ['base64']
+    form_fields = ['base64', 'image_shown', 'screen_width', 'screen_height', 'touch_capable']
 
     @staticmethod
     async def live_method(player: Player, data):

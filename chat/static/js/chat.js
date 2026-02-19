@@ -158,8 +158,14 @@ function onDataChannelOpen() {
     dataChannel.send(JSON.stringify({
         type: 'session.update',
         session: {
+            turn_detection: {
+                type: 'server_vad',
+                threshold: 0.6,
+                silence_duration_ms: 1000,
+            },
             input_audio_transcription: {
                 model: 'whisper-1',
+                language: 'en',
             },
             tools: [
                 {
@@ -243,6 +249,7 @@ function onDataChannelMessage(event) {
                 if (productComparison) {
                     productComparison.style.display = 'block';
                     productComparison.classList.add('fade-in');
+                    document.getElementById('image_shown').value = 1;
                 }
 
                 // Send tool output back so the model continues

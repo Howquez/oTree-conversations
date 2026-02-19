@@ -1,0 +1,132 @@
+/* Chat container */
+.chat-container {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.chat-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 30px;
+}
+
+/* Instructions */
+.instructions {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+.instructions p {
+    color: #166534;
+    margin: 0 0 10px 0;
+    line-height: 1.6;
+}
+
+.instructions p:last-child {
+    margin-bottom: 0;
+}
+
+/* Connection status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.status-dot.speaking {
+    background: #ef4444;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+#status-label {
+    font-size: 16px;
+    color: #374151;
+}
+
+/* Override: lighter pill shadow for chat */
+.voice-pill {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Override: active indicator is green (listening) not red */
+.recording-indicator.active {
+    background: #22c55e;
+    animation: none;
+}
+
+/* Speaking state (bot is speaking) */
+.recording-indicator.speaking {
+    background: #ef4444;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* Override: narrower status text */
+.status-text {
+    min-width: 100px;
+}
+
+/* Connect button (replaces record-btn in chat) */
+.pill-btn.connect-btn {
+    background: #22c55e;
+    color: white;
+}
+
+.pill-btn.connect-btn:hover:not(:disabled) {
+    background: #16a34a;
+}
+
+.pill-btn.connect-btn.active {
+    background: #ef4444;
+}
+
+.pill-btn.connect-btn.active:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+/* Product comparison wrapper */
+.product-comparison-wrapper {
+    margin-top: 30px;
+}
+
+/* Fade-in animation */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Override: taller spacer for chat layout */
+.pill-spacer {
+    height: 120px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .chat-container {
+        padding: 20px 16px;
+    }
+
+    .chat-title {
+        font-size: 24px;
+    }
+}

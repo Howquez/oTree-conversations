@@ -1,5 +1,5 @@
 {{ block styles }}
-<link rel="stylesheet" href="{{ static 'css/record.css' }}">
+<link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
 {{ endblock }}
 
 {{ block scripts }}
@@ -13,16 +13,16 @@
 <p class="question-text">Please record your preference and explain why you would choose one over the other.</p>
 
 <!-- Product comparison -->
-<div class="row row-cols-2 g-5 justify-content-center product-comparison">
+<div class="row row-cols-2 g-4 justify-content-center product-comparison">
     <div class="col card-item">
         <div class="card h-100 border-0 shadow-sm">
+            <img src="https://kentstreetcellars.com.au/cdn/shop/files/diet-coke-can_b987ca3b-bed6-49b1-976e-13b9ac3ccb32_1000x1000.png?v=1687839956" class="card-img-top" alt="Diet Coke">
             <div class="card-body" id="product_a">
                 <h6>
                     <small>Coca-Cola Soft Drink</small>
                 </h6>
                 <h5>Diet Coke</h5>
                 <p class="text-muted mb-2">12 fl oz Can</p>
-                <img src="https://kentstreetcellars.com.au/cdn/shop/files/diet-coke-can_b987ca3b-bed6-49b1-976e-13b9ac3ccb32_1000x1000.png?v=1687839956" class="card-img-top" alt="Diet Coke">
                 <p class="price">$1.50</p>
             </div>
         </div>
@@ -30,18 +30,46 @@
 
     <div class="col card-item">
         <div class="card h-100 border-0 shadow-sm">
+            <img src="https://kentstreetcellars.com.au/cdn/shop/files/zero-sugar-cans_4f0d125e-5bf1-4b57-b376-f23814d758e3_1000x1000.png?v=1687839908" class="card-img-top" alt="Coke Zero">
             <div class="card-body" id="product_b">
                 <h6>
                     <small>Coca-Cola Soft Drink</small>
                 </h6>
                 <h5>Coke Zero Sugar</h5>
                 <p class="text-muted mb-2">12 fl oz Can</p>
-                <img src="https://kentstreetcellars.com.au/cdn/shop/files/zero-sugar-cans_4f0d125e-5bf1-4b57-b376-f23814d758e3_1000x1000.png?v=1687839908" class="card-img-top" alt="Coke Zero">
-                 <p class="price">$2.00</p>
+                <p class="price">$2.00</p>
             </div>
         </div>
     </div>
 </div>
+
+<input type="hidden" name="image_shown" id="image_shown" value="0">
+<input type="hidden" name="screen_width" id="screen_width" value="">
+<input type="hidden" name="screen_height" id="screen_height" value="">
+<input type="hidden" name="touch_capable" id="touch_capable" value="0">
+<script>
+    document.getElementById('screen_width').value = window.screen.width;
+    document.getElementById('screen_height').value = window.screen.height;
+    document.getElementById('touch_capable').value = (navigator.maxTouchPoints > 0) ? 1 : 0;
+
+    // Track whether both product images loaded successfully
+    const productImages = document.querySelectorAll('.card-item .card-img-top');
+    let loadedCount = 0;
+    productImages.forEach(img => {
+        const onLoad = () => {
+            loadedCount++;
+            if (loadedCount === productImages.length) {
+                document.getElementById('image_shown').value = 1;
+            }
+        };
+        if (img.complete && img.naturalWidth > 0) {
+            onLoad();
+        } else {
+            img.addEventListener('load', onLoad);
+            // on error, image_shown stays 0
+        }
+    });
+</script>
 
 <div class="transcript-container">
     <div class="transcript-label">Your Response</div>
