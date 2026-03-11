@@ -9,6 +9,7 @@
 {{ block content }}
 
 <h1 class="display-4">Which would you choose?</h1>
+<p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
 
 <p class="question-text">Please record your preference and explain why you would choose one over the other.</p>
 
@@ -16,28 +17,22 @@
 <div class="row row-cols-2 g-4 justify-content-center product-comparison">
     <div class="col card-item">
         <div class="card h-100 border-0 shadow-sm">
-            <img src="https://kentstreetcellars.com.au/cdn/shop/files/diet-coke-can_b987ca3b-bed6-49b1-976e-13b9ac3ccb32_1000x1000.png?v=1687839956" class="card-img-top" alt="Diet Coke">
+            <img src="{{ pic_A }}" class="card-img-top" alt="{{ product_A }}">
             <div class="card-body" id="product_a">
-                <h6>
-                    <small>Coca-Cola Soft Drink</small>
-                </h6>
-                <h5>Diet Coke</h5>
-                <p class="text-muted mb-2">12 fl oz Can</p>
-                <p class="price">$1.50</p>
+                <h6><small>{{ brand_A }}</small></h6>
+                <h5>{{ product_A }}</h5>
+                <p class="price">${{ price_A }}</p>
             </div>
         </div>
     </div>
 
     <div class="col card-item">
         <div class="card h-100 border-0 shadow-sm">
-            <img src="https://kentstreetcellars.com.au/cdn/shop/files/zero-sugar-cans_4f0d125e-5bf1-4b57-b376-f23814d758e3_1000x1000.png?v=1687839908" class="card-img-top" alt="Coke Zero">
+            <img src="{{ pic_B }}" class="card-img-top" alt="{{ product_B }}">
             <div class="card-body" id="product_b">
-                <h6>
-                    <small>Coca-Cola Soft Drink</small>
-                </h6>
-                <h5>Coke Zero Sugar</h5>
-                <p class="text-muted mb-2">12 fl oz Can</p>
-                <p class="price">$2.00</p>
+                <h6><small>{{ brand_B }}</small></h6>
+                <h5>{{ product_B }}</h5>
+                <p class="price">${{ price_B }}</p>
             </div>
         </div>
     </div>

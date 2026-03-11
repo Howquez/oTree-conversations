@@ -1,0 +1,20 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
+<link rel="stylesheet" href="{{ static 'css/seating.css' }}">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="chat-container">
+    <h1 class="chat-title">Seat Selection Task</h1>
+
+    <div class="instructions">
+        <p>Imagine you are booking a flight for an upcoming vacation. You have reached the seat-selection step, where a voice assistant will help you choose your seat.</p>
+        <p>The assistant will show you pairs of seats one at a time. For each pair, simply say out loud which of the two options you prefer.</p>
+        <p>When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to initiate the conversation.</p>
+    </div>
+
+    {{ next_button }}
+</div>
+
+{{ endblock }}

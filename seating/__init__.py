@@ -10,47 +10,61 @@ from dotenv import load_dotenv
 load_dotenv()
 
 doc = """
-Voice chat bot using OpenAI Realtime API — CSV-driven multi-round product comparison
+Voice chat bot using OpenAI Realtime API — CSV-driven multi-round seat preference survey
 """
 
-# Load stimuli once at module level; NUM_ROUNDS is derived automatically
 _STIMULI = (
-    pd.read_csv('_static/global/stimuli.csv', sep=';')
+    pd.read_csv('_static/global/stimuli_seating.csv', sep=';')
     .apply(lambda col: col.str.strip() if col.dtype == 'object' else col)
     .to_dict('records')
 )
 
+# 2-4-2 layout, rows 45-54
+_COL_LABEL = {
+    'A': 'window seat on the left',
+    'B': 'aisle seat on the left',
+    'C': 'aisle seat in the centre block (left side)',
+    'D': 'middle seat in the centre block',
+    'E': 'middle seat in the centre block',
+    'F': 'aisle seat in the centre block (right side)',
+    'G': 'aisle seat on the right',
+    'H': 'window seat on the right',
+}
 
-def _build_system_prompt(brand_a, product_a, brand_b, product_b, price_a, price_b, round_number, num_rounds):
-    # Use brand names when they differ; fall back to brand + product for same-brand pairs
-    label_a = brand_a if brand_a != brand_b else f"{brand_a} {product_a}"
-    label_b = brand_b if brand_a != brand_b else f"{brand_b} {product_b}"
 
+def _describe_seat(seat_id):
+    row = int(seat_id[:-1])
+    col = seat_id[-1].upper()
+    parts = [f"seat {seat_id}", f"row {row}", _COL_LABEL.get(col, col)]
+    if row == 45:
+        parts.append("exit row with extra legroom, located next to the bathroom")
+    return ', '.join(parts)
+
+
+def _build_system_prompt(seat_a, seat_b, round_number, num_rounds):
     if round_number == 1:
-        return f"""You are a friendly conversational assistant conducting a short product survey. Speak in English.
+        return f"""You are a friendly assistant running a short airline seat survey. Speak in English.
 
-Follow this conversation flow:
-1. Start by greeting the user warmly and asking how their day is going.
-2. Ask one casual smalltalk question (e.g., about the weather, their weekend plans, or something light).
-3. After the smalltalk, transition by briefly explaining what comes next — something like "Great, now I'd like to get your opinion on something" or "Thanks for sharing! So the reason I'm here today is to get your take on a quick product comparison." Do NOT mention specific products or prices yet. Wait for the user to acknowledge.
-4. Once the user responds to the transition, call the show_product_comparison function to display the products. Then ask whether they prefer {label_a} or {label_b}, mentioning that {label_a} costs ${price_a:.2f} and {label_b} costs ${price_b:.2f}.
-5. Once the user has given a clear, complete preference for one of the two products, thank them briefly and call the submit_page function to proceed. Only call submit_page after a definitive answer — not during hedging or mid-sentence.
+Follow these steps strictly in order:
+1. Greet the user warmly (one sentence).
+2. Ask TWO casual small-talk questions, e.g. about their day or travel plans. STOP and wait for their answer.
+3. After they answer, say one short transition (e.g. "Great! Let me show you two seat options.") and call show_seat_map. Do NOT ask about the seats yet — wait for the tool to complete.
+4. After the tool completes, ask ONCE: "Would you prefer Seat A or Seat B?" Do not repeat this question.
+5. When they answer clearly, call submit_page. Then say one sentence explaining the remaining rounds, e.g. "For the next rounds you'll see two seats on screen each time — just say out loud whether you prefer A or B and we'll move straight on." Then stop."""
+    elif round_number < num_rounds:
+        return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English.
 
-Keep your responses short and conversational. Don't be robotic - be natural and friendly."""
+The seat map is already on screen. Say nothing — wait silently for the participant to say A or B.
+When they answer clearly, call submit_page. Then say one short sentence bridging to the next round, e.g. "Got it — next pair coming up." Say nothing else."""
     else:
-        return f"""You are a friendly conversational assistant conducting a product survey. Speak in English.
+        return f"""You are facilitating the final round of a seat survey. Speak in English.
 
-This is round {round_number} of {num_rounds}. The user has already completed the previous comparisons — skip any greeting or smalltalk entirely.
-
-Start with a brief, natural transition like "Alright, here's the next one" or "Great, let's keep going." Then ask whether they prefer {label_a} or {label_b}, mentioning that {label_a} costs ${price_a:.2f} and {label_b} costs ${price_b:.2f}.
-
-Once the user has given a clear, complete preference for one of the two products, thank them briefly and call the submit_page function to proceed. Only call submit_page after a definitive answer — not during hedging or mid-sentence.
-
-Keep your responses short and conversational."""
+The seat map is already on screen. Say nothing — wait for the participant to say A or B.
+When they answer clearly, call submit_page. Then say one short closing line, e.g. "That's the last one — thanks!" Say nothing else."""
 
 
 class C(BaseConstants):
-    NAME_IN_URL = 'chat'
+    NAME_IN_URL = 'seating'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = len(_STIMULI)
 
@@ -67,10 +81,16 @@ class Player(BasePlayer):
     chat_log = models.LongStringField(blank=True)
     choice_pair = models.IntegerField(blank=True)
     choice = models.StringField(blank=True)
-    image_shown = models.IntegerField(initial=0)
+    seat_map_shown = models.IntegerField(initial=0)
     screen_width = models.IntegerField(blank=True)
     screen_height = models.IntegerField(blank=True)
     touch_capable = models.IntegerField(initial=0)
+    # Paradata
+    response_onset_ms = models.IntegerField(blank=True)
+    response_duration_ms = models.IntegerField(blank=True)
+    webrtc_stats = models.LongStringField(blank=True)
+    time_on_page_ms = models.IntegerField(blank=True)
+    user_agent = models.StringField(blank=True)
 
 
 def creating_session(subsession):
@@ -82,24 +102,24 @@ def creating_session(subsession):
             player.participant.vars['choices'] = choices
 
 
-# PAGES
+class Instructions(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
 class record(Page):
     form_model = 'player'
-    form_fields = ['chat_log', 'image_shown', 'screen_width', 'screen_height', 'touch_capable']
+    form_fields = ['chat_log', 'seat_map_shown', 'screen_width', 'screen_height', 'touch_capable',
+                   'response_onset_ms', 'response_duration_ms', 'webrtc_stats', 'time_on_page_ms', 'user_agent']
 
     @staticmethod
     def vars_for_template(player: Player):
         current = player.participant.vars['choices'][player.round_number - 1]
         player.choice_pair = int(current['pair_id'])
         return dict(
-            brand_A=current['brand_A'],
-            product_A=current['product_A'],
-            price_A=f"{float(current['price_A']):.2f}",
-            pic_A=current['pic_A'],
-            brand_B=current['brand_B'],
-            product_B=current['product_B'],
-            price_B=f"{float(current['price_B']):.2f}",
-            pic_B=current['pic_B'],
+            seat_A=current['seat_A'],
+            seat_B=current['seat_B'],
         )
 
     @staticmethod
@@ -111,12 +131,8 @@ class record(Page):
                 OPENAI_KEY = os.environ.get('WHISPER_KEY')
                 current = player.participant.vars['choices'][player.round_number - 1]
                 system_prompt = _build_system_prompt(
-                    brand_a=current['brand_A'],
-                    product_a=current['product_A'],
-                    brand_b=current['brand_B'],
-                    product_b=current['product_B'],
-                    price_a=float(current['price_A']),
-                    price_b=float(current['price_B']),
+                    seat_a=current['seat_A'],
+                    seat_b=current['seat_B'],
                     round_number=player.round_number,
                     num_rounds=C.NUM_ROUNDS,
                 )
@@ -139,8 +155,8 @@ class record(Page):
                             'tools': [
                                 {
                                     'type': 'function',
-                                    'name': 'show_product_comparison',
-                                    'description': 'Displays the product comparison card with the two products side by side. Call this before asking the user about their preference.',
+                                    'name': 'show_seat_map',
+                                    'description': 'Displays the seat map highlighting the two seats being compared. Call this before asking the user about their preference.',
                                     'parameters': {
                                         'type': 'object',
                                         'properties': {},
@@ -151,8 +167,6 @@ class record(Page):
                     )
 
                 result = response.json()
-                print(f"Realtime session created: {result.get('id', 'unknown')}")
-
                 yield {player.id_in_group: {
                     'type': 'token',
                     'token': result.get('client_secret', {}).get('value', ''),
@@ -168,7 +182,7 @@ class record(Page):
 
         elif msg_type == 'upload_url':
             try:
-                filename = f"{player.session.code}_{player.participant.code}_chat_r{player.round_number}.webm"
+                filename = f"{player.session.code}_{player.participant.code}_seating_r{player.round_number}.webm"
                 s3_client = boto3.client('s3',
                     aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
                     aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
@@ -184,7 +198,6 @@ class record(Page):
                     },
                     ExpiresIn=300,
                 )
-                print(f"[audio] Presigned URL generated for: {filename}")
                 yield {player.id_in_group: {
                     'type': 'upload_url',
                     'url': presigned_url,
@@ -199,7 +212,6 @@ class record(Page):
 
         elif msg_type == 'chat_log':
             player.chat_log = data.get('log', '')
-            print(f"Chat log saved for player {player.id_in_group}")
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
@@ -208,15 +220,15 @@ class record(Page):
             return
 
         current = player.participant.vars['choices'][player.round_number - 1]
-        product_a = f"{current['brand_A']} {current['product_A']}"
-        product_b = f"{current['brand_B']} {current['product_B']}"
+        seat_a = current['seat_A']
+        seat_b = current['seat_B']
 
         prompt = (
-            f"I asked an English-speaking participant to choose between two products: "
-            f"product_A called '{product_a}' and product_B called '{product_b}'. "
+            f"I asked a participant to choose between two airplane seats: "
+            f"seat_A called '{seat_a}' and seat_B called '{seat_b}'. "
             f"The following is a JSON transcript of the voice conversation. "
-            f"Based on the conversation, which product did the participant choose? "
-            f"Strictly respond with 'product_A' or 'product_B'. "
+            f"Based on the conversation, which seat did the participant choose? "
+            f"Strictly respond with 'seat_A' or 'seat_B'. "
             f"If no choice can be determined, respond with 'None'.\n"
             f"Conversation: {player.chat_log}"
         )
@@ -242,6 +254,4 @@ class record(Page):
             player.choice = 'None'
 
 
-page_sequence = [
-    record,
-]
+page_sequence = [Instructions, record]

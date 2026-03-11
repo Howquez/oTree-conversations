@@ -1,61 +1,55 @@
 {{ block styles }}
 <link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
-<link rel="stylesheet" href="{{ static 'css/chat.css' }}">
+<link rel="stylesheet" href="{{ static 'css/seating.css' }}">
 {{ endblock }}
 
 {{ block content }}
 
 <div class="chat-container">
-    <h1 class="chat-title">Voice Conversation</h1>
+    {{ if player.round_number == 1 }}
+        <h1 class="chat-title">Chat</h1>
+    {{ else }}
+       <h1 class="chat-title">Seat Preference</h1>
+    {{ endif }}
     <p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
 
-    {% if player.round_number == 1 %}
+    {{ if player.round_number == 1 }}
     <div class="instructions" id="instructions">
-        <p>You'll have a short voice conversation with an AI assistant.</p>
-        <p>Click the microphone button below to start, then say "Hello" to begin the conversation.</p>
+        <p>You'll have a short voice conversation about seat preferences.</p>
+        <p>Click the microphone button below to start, then say "Hello" to begin.</p>
     </div>
-    {% endif %}
+    {{ endif }}
 
-
-    <!-- Product comparison (hidden until tool call) -->
-    <div class="product-comparison-wrapper" id="product-comparison" style="display: none;">
-        <div class="row row-cols-2 g-4 justify-content-center product-comparison">
-            <div class="col card-item">
-                <div class="card h-100 border-0 shadow-sm">
-                    <img src="{{ pic_A }}" class="card-img-top" alt="{{ product_A }}">
-                    <div class="card-body" id="product_a">
-                        <h6><small>{{ brand_A }}</small></h6>
-                        <h5>{{ product_A }}</h5>
-                        <p class="price">${{ price_A }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col card-item">
-                <div class="card h-100 border-0 shadow-sm">
-                    <img src="{{ pic_B }}" class="card-img-top" alt="{{ product_B }}">
-                    <div class="card-body" id="product_b">
-                        <h6><small>{{ brand_B }}</small></h6>
-                        <h5>{{ product_B }}</h5>
-                        <p class="price">${{ price_B }}</p>
-                    </div>
-                </div>
-            </div>
+    <!-- Seat map (hidden until tool call) -->
+    <div id="seat-map-wrapper" style="display: none;">
+        <div class="seat-map-legend">
+            <span class="legend-dot option-a-dot"></span> Seat A
+            &nbsp;&nbsp;
+            <span class="legend-dot option-b-dot"></span> Seat B
+        </div>
+        <div class="seat-map-scroll">
+            <div id="seat-map"></div>
         </div>
     </div>
 </div>
 
 <input type="hidden" name="chat_log" id="id_chat_log" value="">
-<input type="hidden" name="image_shown" id="image_shown" value="0">
+<input type="hidden" name="seat_map_shown" id="seat_map_shown" value="0">
 <input type="hidden" name="screen_width" id="screen_width" value="">
 <input type="hidden" name="screen_height" id="screen_height" value="">
 <input type="hidden" name="touch_capable" id="touch_capable" value="0">
+<input type="hidden" name="response_onset_ms" id="response_onset_ms" value="">
+<input type="hidden" name="response_duration_ms" id="response_duration_ms" value="">
+<input type="hidden" name="webrtc_stats" id="webrtc_stats" value="">
+<input type="hidden" name="time_on_page_ms" id="time_on_page_ms" value="">
+<input type="hidden" name="user_agent" id="user_agent" value="">
 <script>
     document.getElementById('screen_width').value = window.screen.width;
     document.getElementById('screen_height').value = window.screen.height;
     document.getElementById('touch_capable').value = (navigator.maxTouchPoints > 0) ? 1 : 0;
+    document.getElementById('user_agent').value = navigator.userAgent;
 </script>
 
-<!-- Hidden chat log for data storage -->
 <div id="chat-messages" style="display: none;"></div>
 
 <div class="pill-spacer"></div>
@@ -65,7 +59,6 @@
     <div class="recording-indicator" id="recording-indicator"></div>
     <span class="status-text" id="status-text">Ready</span>
 
-    <!-- Connect / Disconnect button -->
     <button type="button" class="pill-btn connect-btn" id="connect-btn" title="Start conversation">
         <svg id="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -78,7 +71,6 @@
         </svg>
     </button>
 
-    <!-- Next/Submit button -->
     <button type="submit" class="pill-btn next-btn" id="submit_button" title="Finish" disabled>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14"/>
@@ -87,7 +79,11 @@
     </button>
 </div>
 
-<script>const OTREE_ROUND = {{ player.round_number }};</script>
-<script src="{{ static 'js/chat.js' }}"></script>
+<script>
+    const OTREE_ROUND = {{ player.round_number }};
+    const SEAT_A = "{{ seat_A }}";
+    const SEAT_B = "{{ seat_B }}";
+</script>
+<script src="{{ static 'js/seating.js' }}"></script>
 
 {{ endblock }}

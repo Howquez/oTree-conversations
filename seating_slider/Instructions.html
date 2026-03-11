@@ -1,0 +1,19 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/seating_slider.css' }}">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="page-container">
+    <p class="page-title">Seat Preference</p>
+
+    <div class="slider-card" style="text-align: center;">
+        <p>You have now completed the voice conversations.</p>
+        <p>For each seat pair you just discussed, we would like you to indicate how strongly you preferred one seat over the other.</p>
+        <p>Use the slider on each page to record your preference.</p>
+
+        {{ next_button }}
+    </div>
+</div>
+
+{{ endblock }}

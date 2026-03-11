@@ -56,6 +56,12 @@
                                         <td><small>{{ choice }}</small></td>
                                     {{ endfor }}
                                 </tr>
+                                <tr>
+                                    <td><small>{{ form.naturalness_1.label }}</small></td>
+                                    {{ for choice in form.naturalness_1 }}
+                                        <td><small>{{ choice }}</small></td>
+                                    {{ endfor }}
+                                </tr>
                         </table>
 
                         <div class="d-flex justify-content-center m-3">

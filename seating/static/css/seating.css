@@ -1,0 +1,200 @@
+/* ── Page layout ─────────────────────────────────────────────────────────── */
+.chat-container {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.chat-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 30px;
+}
+
+/* ── Instructions ────────────────────────────────────────────────────────── */
+.instructions {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 30px;
+}
+.instructions p { color: #166534; margin: 0 0 10px 0; line-height: 1.6; }
+.instructions p:last-child { margin-bottom: 0; }
+
+/* ── Seat map wrapper ────────────────────────────────────────────────────── */
+#seat-map-wrapper {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.seat-map-scroll {
+    overflow-x: auto;
+    display: inline-block;
+    max-width: 100%;
+}
+
+#seat-map {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+/* ── Rows & cells ────────────────────────────────────────────────────────── */
+.sm-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.sm-exit-row .sm-seat {
+    /* slightly taller to suggest extra legroom */
+    height: 38px;
+    margin-top: 6px;
+}
+
+.sm-row-label {
+    width: 26px;
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: right;
+    padding-right: 4px;
+    flex-shrink: 0;
+}
+
+
+.sm-aisle {
+    width: 14px;
+    flex-shrink: 0;
+}
+
+/* ── Individual seat ─────────────────────────────────────────────────────── */
+.sm-seat {
+    width: 28px;
+    height: 30px;
+    border-radius: 5px 5px 2px 2px; /* headrest shape */
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    color: #6b7280;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.sm-seat.option-a {
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(245,158,11,0.4);
+    transform: scale(1.12);
+}
+
+.sm-seat.option-b {
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(59,130,246,0.4);
+    transform: scale(1.12);
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.seat-map-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+.option-a-dot { background: #f59e0b; }
+.option-b-dot { background: #3b82f6; }
+
+/* ── Facility row (bathroom above exit row) ──────────────────────────────── */
+.sm-facility-row {
+    margin-bottom: 2px;
+}
+
+.sm-facilities-bar {
+    flex: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.sm-wc {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    border: 1px solid #bae6fd;
+}
+
+/* ── Exit signs ──────────────────────────────────────────────────────────── */
+.sm-exit-sign {
+    width: 26px;
+    min-height: 38px;
+    background: #15803d;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-lr;
+    flex-shrink: 0;
+    padding: 3px 0;
+}
+
+/* ── Fade-in ─────────────────────────────────────────────────────────────── */
+.fade-in { animation: fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Voice pill overrides ────────────────────────────────────────────────── */
+.voice-pill { box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+
+.recording-indicator.active  { background: #22c55e; animation: none; }
+.recording-indicator.speaking { background: #ef4444; animation: pulse 1s ease-in-out infinite; }
+
+.status-text { min-width: 100px; }
+
+.pill-btn.connect-btn              { background: #22c55e; color: white; }
+.pill-btn.connect-btn:hover:not(:disabled) { background: #16a34a; }
+.pill-btn.connect-btn.active       { background: #ef4444; }
+.pill-btn.connect-btn.active:hover:not(:disabled) { background: #dc2626; }
+
+.pill-spacer { height: 120px; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .chat-container { padding: 20px 12px; }
+    .chat-title { font-size: 22px; }
+    .sm-seat { width: 24px; height: 26px; font-size: 9px; }
+    .sm-col-label { width: 24px; font-size: 10px; }
+    .sm-row-label { width: 22px; }
+}

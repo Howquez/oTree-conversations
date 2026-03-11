@@ -11,7 +11,7 @@ class C(BaseConstants):
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
 
-    QUESTIONNAIRE_TEMPLATE = "questionnaire/T_Questionnaire.html"
+    QUESTIONNAIRE_TEMPLATE = "outro/T_Questionnaire.html"
 
 class Subsession(BaseSubsession):
     pass
@@ -69,6 +69,18 @@ class Player(BasePlayer):
         widget=widgets.RadioSelect,
         choices=[1, 2, 3, 4, 5, 6, 7])
 
+    realism_1 = models.IntegerField(
+        doc="The voice interface felt realistic.",
+        label="The voice interface felt realistic.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7])
+
+    realism_2 = models.IntegerField(
+        doc="I could imagine using a system like this in real life.",
+        label="I could imagine using a system like this in real life.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7])
+
     familiarity = models.IntegerField(
         label="How familiar would you consider yourself to be with voice-activated technologies (e.g., website, car, app, speakers)?",
         doc="How familiar would you consider yourself to be with voice-activated technologies (e.g., website, car, app, speakers)?",
@@ -106,6 +118,13 @@ class Player(BasePlayer):
         choices=[1, 2, 3, 4, 5, 6, 7],
         blank=False)
 
+    naturalness_1 = models.IntegerField(
+        label="Speaking my choices felt natural.",
+        doc="Speaking my choices felt natural.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7],
+        blank=False)
+
 # Demographics
     age = models.IntegerField(label="Please enter your age",
                               min=18,
@@ -137,10 +156,30 @@ class Player(BasePlayer):
     )
 
 
+# Turn-taking
+    turntaking_1 = models.IntegerField(
+        label="The voice interface and I sometimes spoke at the same time.",
+        doc="The voice interface and I sometimes spoke at the same time.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7],
+        blank=False)
+
+    turntaking_2 = models.IntegerField(
+        label="I sometimes started speaking before the voice interface finished.",
+        doc="I sometimes started speaking before the voice interface finished.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7],
+        blank=False)
+
+    turntaking_3 = models.IntegerField(
+        label="The voice interface sometimes started speaking before I finished.",
+        doc="The voice interface sometimes started speaking before I finished.",
+        widget=widgets.RadioSelect,
+        choices=[1, 2, 3, 4, 5, 6, 7],
+        blank=False)
+
 # OTF
     OTF = models.LongStringField(label="Please use the box below to share your thoughts about the study (e.g., any aspects you particularly liked or disliked) to help us improve it.", blank=False)
-    easy_choices = models.LongStringField(label="...you find it very EASY to choose one over the other?", blank=False)
-    hard_choices = models.LongStringField(label="...you find it very HARD to choose one over the other?", blank=False)
 
 
 
@@ -154,7 +193,7 @@ class Interface(Page):
 
     @staticmethod
     def get_form_fields(player: Player):
-        form_fields = ["interface_1", "interface_2", "interface_3", "interface_4", "interface_5", "interface_6", "interface_7"]
+        form_fields = ["interface_1", "interface_2", "interface_3", "interface_4", "interface_5", "interface_6", "interface_7", "realism_1", "realism_2"]
         random.shuffle(form_fields)
         return form_fields
 
@@ -166,7 +205,7 @@ class Familiarity(Page):
 
 class Situation(Page):
     form_model = "player"
-    form_fields = ["location", "disguise_1", "disguise_2"]
+    form_fields = ["location", "disguise_1", "disguise_2", "naturalness_1"]
 
 
 class Demographics(Page):
@@ -185,15 +224,20 @@ class Other_Ideas(Page):
     form_model = "player"
     form_fields = ["easy_choices", "hard_choices"]
 
+class Interaction(Page):
+    form_model = "player"
+    form_fields = ["turntaking_1", "turntaking_2", "turntaking_3"]
+
+
 class Debriefing(Page):
     pass
 
 
-page_sequence = [ # A_Instructions,
-                 # Open_Text,
-                 # Other_Ideas,
-                 # Interface,
-                 # Familiarity,
-                 # Situation,
-                 # Demographics,
+page_sequence = [ A_Instructions,
+                 Open_Text,
+                 Interface,
+                 Interaction,
+                 Familiarity,
+                 Situation,
+                 Demographics,
                  Debriefing]

@@ -11,6 +11,16 @@ SESSION_CONFIGS = [
         app_sequence=['chat', 'outro'],
         num_demo_participants=3,
     ),
+    # dict(
+    #     name='voice_chat_eleven',
+    #     app_sequence=['eleven', 'outro'],
+    #     num_demo_participants=3,
+    # ),
+    dict(
+        name='seat_preference',
+        app_sequence=['seating', 'seating_slider', 'outro'],
+        num_demo_participants=3,
+    ),
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -25,7 +35,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     transcript=True,
 )
 
-PARTICIPANT_FIELDS = []
+PARTICIPANT_FIELDS = ["finished"]
 SESSION_FIELDS = []
 
 ROOMS = [

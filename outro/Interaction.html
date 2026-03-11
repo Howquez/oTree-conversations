@@ -19,22 +19,17 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-sm-10 col-md-10 col-lg-6">
-                <!-- Decision Card -->
                 <div class="card rounded mt-5 shadow-lg">
                     <div class="card-body">
                         <h4 class="mb-0">
-                            Feedback.
+                            Think about the interaction.
                         </h4>
 
                         <small class="text-secondary">
-                            Think about everyday products you regularly buy. Are there any OTHER pairs of items from the same brand and at the same price where...
+                            Please rate how much you agree or disagree with the following statements.
                         </small>
 
-                        <p class="mt-4">
-                            <small>
-                                {{ formfields }}
-                            </small>
-                        </p>
+{{ include C.QUESTIONNAIRE_TEMPLATE }}
 
                         <div class="d-flex justify-content-center m-3">
                             <button class="btn btn-primary shadow" type="submit" id="submitButton">
@@ -46,6 +41,4 @@
             </div>
         </div>
     </div>
-
 {{ endblock }}
-

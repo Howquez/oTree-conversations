@@ -15,7 +15,7 @@ let uploadUrlResolver = null; // resolved when backend sends presigned URL
 
 // Elements (set after DOM ready)
 let connectBtn, connectIcon, disconnectIcon, statusText, indicator;
-let statusDot, statusLabel, instructions, connectionStatus;
+let instructions;
 let chatMessages, chatLogInput, submitButton;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,10 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     disconnectIcon = document.getElementById('disconnect-icon');
     statusText = document.getElementById('status-text');
     indicator = document.getElementById('recording-indicator');
-    statusDot = document.getElementById('status-dot');
-    statusLabel = document.getElementById('status-label');
     instructions = document.getElementById('instructions');
-    connectionStatus = document.getElementById('connection-status');
     chatMessages = document.getElementById('chat-messages');
     chatLogInput = document.getElementById('id_chat_log');
     submitButton = document.getElementById('submit_button');
@@ -39,6 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
             disconnect();
         }
     });
+
+    // Auto-start from round 2 onwards
+    if (typeof OTREE_ROUND !== 'undefined' && OTREE_ROUND > 1) {
+        const productComparison = document.getElementById('product-comparison');
+        if (productComparison) {
+            productComparison.style.display = 'block';
+            document.getElementById('image_shown').value = 1;
+        }
+        requestToken();
+    }
 });
 
 // Request ephemeral token from backend
@@ -133,7 +140,7 @@ async function startWebRTC(ephemeralToken, model) {
 
         // Update UI
         isConnected = true;
-        statusText.textContent = 'Listening...';
+        statusText.textContent = 'In conversation';
         indicator.classList.add('active');
         connectIcon.style.display = 'none';
         disconnectIcon.style.display = 'block';
@@ -141,9 +148,7 @@ async function startWebRTC(ephemeralToken, model) {
         connectBtn.classList.add('active');
         submitButton.disabled = false;
 
-        // Hide instructions, show status
-        instructions.style.display = 'none';
-        connectionStatus.style.display = 'flex';
+        if (instructions) instructions.style.display = 'none';
 
     } catch (err) {
         console.error('WebRTC connection error:', err);
@@ -171,7 +176,16 @@ function onDataChannelOpen() {
                 {
                     type: 'function',
                     name: 'show_product_comparison',
-                    description: 'Displays the product comparison card showing Diet Coke and Coke Zero side by side. Call this before asking the user about their preference.',
+                    description: 'Displays the product comparison card with the two products side by side. Call this before asking the user about their preference.',
+                    parameters: {
+                        type: 'object',
+                        properties: {},
+                    },
+                },
+                {
+                    type: 'function',
+                    name: 'submit_page',
+                    description: 'Advances to the next round. Call this only after the user has given a clear, complete preference for one of the two products — not during hedging or mid-sentence.',
                     parameters: {
                         type: 'object',
                         properties: {},
@@ -180,6 +194,11 @@ function onDataChannelOpen() {
             ],
         },
     }));
+
+    // On rounds > 1 the bot starts the conversation immediately
+    if (typeof OTREE_ROUND !== 'undefined' && OTREE_ROUND > 1) {
+        dataChannel.send(JSON.stringify({ type: 'response.create' }));
+    }
 }
 
 function onDataChannelMessage(event) {
@@ -188,18 +207,12 @@ function onDataChannelMessage(event) {
     switch (msg.type) {
         case 'input_audio_buffer.speech_started':
             indicator.classList.add('speaking');
-            statusDot.classList.add('speaking');
-            statusText.textContent = 'Speaking...';
-            statusLabel.textContent = 'You are speaking...';
             pendingUserMessage = addMessage('user', '...');
             pendingUserMessage.classList.add('pending');
             break;
 
         case 'input_audio_buffer.speech_stopped':
             indicator.classList.remove('speaking');
-            statusDot.classList.remove('speaking');
-            statusText.textContent = 'Listening...';
-            statusLabel.textContent = 'Listening...';
             break;
 
         case 'conversation.item.input_audio_transcription.completed':
@@ -221,8 +234,7 @@ function onDataChannelMessage(event) {
         case 'response.audio_transcript.delta':
             if (!currentBotMessage) {
                 currentBotMessage = addMessage('bot', '');
-                statusText.textContent = 'Assistant speaking...';
-                statusLabel.textContent = 'Assistant is speaking...';
+                indicator.classList.add('speaking');
             }
             currentBotMessage.textContent += msg.delta || '';
             break;
@@ -233,22 +245,40 @@ function onDataChannelMessage(event) {
                 currentBotMessage.textContent = finalText;
                 saveToChatHistory('bot', finalText);
                 currentBotMessage = null;
-                statusText.textContent = 'Listening...';
-                statusLabel.textContent = 'Listening...';
+                indicator.classList.remove('speaking');
             }
             break;
 
         case 'response.function_call_arguments.done':
             console.log('[tool call]', msg.name, 'call_id:', msg.call_id);
-            if (msg.name === 'show_product_comparison') {
+            if (msg.name === 'submit_page') {
+                // Acknowledge the tool call so the model can deliver its closing remark
+                dataChannel.send(JSON.stringify({
+                    type: 'conversation.item.create',
+                    item: {
+                        type: 'function_call_output',
+                        call_id: msg.call_id,
+                        output: JSON.stringify({ success: true }),
+                    },
+                }));
+                dataChannel.send(JSON.stringify({ type: 'response.create' }));
+
+                // Submit after a short delay to let the bot finish speaking
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.click();
+                }, 3000);
+
+            } else if (msg.name === 'show_product_comparison') {
                 // Inject inaudible marker tone into the recording
                 injectMarkerTone();
 
                 // Reveal product comparison with fade-in
                 const productComparison = document.getElementById('product-comparison');
                 if (productComparison) {
+                    const alreadyVisible = productComparison.style.display === 'block';
                     productComparison.style.display = 'block';
-                    productComparison.classList.add('fade-in');
+                    if (!alreadyVisible) productComparison.classList.add('fade-in');
                     document.getElementById('image_shown').value = 1;
                 }
 
@@ -389,9 +419,7 @@ async function disconnect() {
     currentBotMessage = null;
 
     statusText.textContent = 'Ended';
-    statusLabel.textContent = 'Conversation ended';
     indicator.classList.remove('active', 'speaking');
-    statusDot.classList.remove('speaking');
     connectIcon.style.display = 'block';
     disconnectIcon.style.display = 'none';
     connectBtn.classList.remove('active');

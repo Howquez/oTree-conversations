@@ -1,0 +1,50 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/seating_slider.css' }}">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="page-container">
+    <p class="page-title">Seat Preference</p>
+    <p class="round-label">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
+
+    <!-- Seat map -->
+    <div id="seat-map-wrapper">
+        <div class="seat-map-legend">
+            <span class="legend-dot option-a-dot"></span> Seat A
+            &nbsp;&nbsp;
+            <span class="legend-dot option-b-dot"></span> Seat B
+        </div>
+        <div class="seat-map-scroll">
+            <div id="seat-map"></div>
+        </div>
+    </div>
+
+    <!-- Slider card -->
+    <div class="slider-card">
+        <p class="slider-question">How much did you prefer one seat over the other?</p>
+
+        <div class="slider-anchors">
+            <span>I strongly preferred <em class="seat-pill pill-a">A</em></span>
+            <span>No preference</span>
+            <span>I strongly preferred <em class="seat-pill pill-b">B</em></span>
+        </div>
+
+        <input type="range" id="id_strength" name="strength" min="-50" max="50" step="1" class="notclicked">
+        {{ formfield_errors 'strength' }}
+
+        <p class="slider-hint" id="slider-hint">Move the slider to record your preference.</p>
+
+        <div class="submit-wrap">
+            <button type="submit" class="btn-submit" id="submit-btn">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SEAT_A = "{{ seat_A }}";
+    const SEAT_B = "{{ seat_B }}";
+</script>
+<script src="{{ static 'js/seating_slider.js' }}"></script>
+
+{{ endblock }}

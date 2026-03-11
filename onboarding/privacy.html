@@ -1,62 +1,131 @@
 <small>
-    Within the scope of the study, great importance is attached to compliance with data protection regulations,
-    the protection of privacy and the confidentiality of the data. We strictly adhere to
-    all applicable laws and regulations on data protection. With these notes we inform you
-    about the processing of your personal data and the rights to which you are entitled.
+    Within the scope of this study, great importance is attached to compliance with data protection
+    regulations, the protection of privacy, and the confidentiality of the data. We strictly adhere to
+    all applicable laws and regulations on data protection, including the EU General Data Protection
+    Regulation (GDPR) and the Swiss Federal Act on Data Protection (FADP). With these notes we inform
+    you about the processing of your personal data and the rights to which you are entitled.
     <br><br>
 </small>
 
 <h5>Investigator</h5>
 <address>
     Mr. Hauke Roggenkamp,
-    <a href="mailto:hauke.roggenkamp@mtec.ethz.ch?subject=Decision articulation study: {{ participant.code }}">
+    <a href="mailto:hauke.roggenkamp@mtec.ethz.ch?subject=Seat preference study: {{ participant.code }}">
         hauke.roggenkamp[at]mtec.ethz.ch
-    </a>
+    </a><br>
+    Chair of Technology Marketing, ETH Zurich
 </address>
-<br><br>
+<br>
 
-
-<h5>Confidentiality</h5>
+<h5>What data we collect</h5>
 <p>
-    The data collected in this study will be confidential. No personally identifiable information will be
-    collected unless voluntarily provided. Any reports and presentations about the findings from this study
-    will not include any information that could identify you. Eventually, results of the analyses may be
-    published on an aggregate level in an academic journal. We may share the data we collect in this study
-    with other researchers doing future studies – if we share your data, we will not include information
-    that could identify you.
+    This study collects the following data:
 </p>
-<br><br>
+<ul>
+    <li><strong>Voice recordings.</strong> Your microphone audio and the voice agent's audio are recorded
+        as a stereo audio file (.webm) for each decision round. Voice recordings are potentially
+        identifiable and are therefore treated as pseudonymous personal data throughout.</li>
+    <li><strong>Conversation transcripts.</strong> A text transcript of the conversation between you and
+        the voice agent is generated automatically.</li>
+    <li><strong>Survey responses.</strong> Your answers to all questionnaire items and slider ratings.</li>
+    <li><strong>Technical metadata.</strong> Browser type, screen dimensions, response timing, and
+        connection quality indicators.</li>
+</ul>
+<br>
 
-<h5>Withdrawal from the participation or the consent</h5>
+<h5>Legal basis for processing</h5>
 <p>
-    The participation in this research project is voluntary. You have at all times the right to withdraw
-    from participating in the research project, without having to state the reason. You also have the right
-    to withdraw your consent which will result in your personal information being removed so that it
-    cannot be linked to you anymore. However, if you decide to discontinue your participation you will not
-    be remunerated.
+    The legal basis for processing your personal data is your freely given, informed consent
+    (GDPR Art. 6(1)(a)). You may withdraw this consent at any time (see below).
 </p>
-<br><br>
+<br>
 
-<h5>Individual Rights</h5>
+<h5>Third-party data processors</h5>
 <p>
-    You are entitled to ask questions about this project at any time by contacting the above-mentioned
-    investigator by e-mail.
-
-    You have the right to access and require a copy of your personal data, object to the processing of your
-    personal data, have them rectified or deleted. You also have a right to limit the processing of your
-    data. You can exercise these rights by contacting the investigator. The easiest way to do so is by
-    providing your participant code: <code>{{ participant.code }}</code>
+    To operate this study, your data is processed by the following third-party services:
 </p>
-<br><br>
+<ul>
+    <li><strong>OpenAI, Inc. (USA).</strong> Your voice is transmitted in real time to OpenAI's
+        Realtime API for speech recognition and to power the AI voice agent. Conversation transcripts
+        are also sent to OpenAI's API for automated analysis. OpenAI processes this data under a data
+        processing agreement. See <a href="https://openai.com/policies/privacy-policy" target="_blank">OpenAI's privacy policy</a>.</li>
+    <li><strong>Amazon Web Services (AWS), eu-north-1 (Stockholm, Sweden).</strong> Voice recordings
+        are temporarily stored on a private, access-restricted Amazon S3 bucket located in the EU.
+        AWS processes this data under a data processing agreement.</li>
+</ul>
+<br>
 
-<h5>
-    By agreeing to these terms you consent to the following statement:
-</h5>
+<h5>Data retention and storage</h5>
+<p>
+    Voice recordings will be transferred from Amazon S3 to a password-protected hard drive held at
+    ETH Zurich within two weeks of data collection, after which they will be deleted from AWS.
+    All study data — including recordings, transcripts, and survey responses — will be retained for
+    as long as is necessary for the research and any resulting publications, in accordance with
+    ETH Zurich's data retention policies.
+</p>
+<p>
+    Results of the analyses may be published at an aggregate level in an academic journal.
+    Pseudonymised data (identified only by a random participant code, not by name or voice) may be
+    shared with journal data editors as part of the peer-review process for a resulting publication.
+    We will not share data in any form that could directly identify you.
+</p>
+<br>
+
+<h5>Interaction with an AI system</h5>
+<p>
+    During this study you will speak with an AI voice agent powered by OpenAI. You are not speaking
+    with a human. The conversation is processed automatically to extract your stated preference and
+    to analyse vocal characteristics.
+</p>
+<br>
+
+<h5>Confidentiality and pseudonymisation</h5>
+<p>
+    Your responses are linked only to a randomly assigned participant code, not to your name or
+    Prolific ID. Voice recordings are potentially identifiable and are therefore not considered
+    fully anonymous. Access to the raw data is restricted to members of the research team and,
+    where required for publication, to journal data editors under equivalent confidentiality
+    obligations.
+</p>
+<br>
+
+<h5>Withdrawal from participation or consent</h5>
+<p>
+    Participation in this research project is voluntary. You have the right at any time to withdraw
+    from the study without stating a reason. You also have the right to withdraw your consent, which
+    will result in your data being deleted so that it can no longer be linked to you. However, if you
+    discontinue your participation you will not be remunerated. To exercise this right, contact the
+    investigator and provide your participant code: <code>{{ participant.code }}</code>
+</p>
+<br>
+
+<h5>Your rights</h5>
+<p>
+    Under applicable data protection law you have the right to:
+</p>
+<ul>
+    <li>Access a copy of your personal data;</li>
+    <li>Request rectification or deletion of your personal data;</li>
+    <li>Object to or request restriction of the processing of your personal data;</li>
+    <li>Lodge a complaint with a supervisory authority — in Switzerland the Federal Data Protection
+        and Information Commissioner (FDPIC, <a href="https://www.edoeb.admin.ch" target="_blank">www.edoeb.admin.ch</a>),
+        or the data protection authority of your EU member state.</li>
+</ul>
+<p>
+    To exercise any of these rights, contact the investigator by e-mail and provide your participant
+    code: <code>{{ participant.code }}</code>
+</p>
+<br>
+
+<h5>By agreeing to these terms you consent to the following statement:</h5>
 <blockquote>
     <em>
-    "I am 18 years of age or older, I consent/agree to participate in this study, I have read the
-    information that explains the use of my data in this research, I understand its contents and agree to
-    donate my data for the use of this research, and I will not have any financial benefits that result from
-    the commercial development of this research."
+        "I am 18 years of age or older. I have read and understood this privacy policy. I consent to
+        participate in this study and to the processing of my personal data — including voice
+        recordings — as described above. I understand that my voice recordings are pseudonymous and
+        potentially identifiable, and that they will be processed by OpenAI and temporarily stored on
+        Amazon AWS before being transferred to a secure hard drive at ETH Zurich. I understand that I
+        will not have any financial benefits that result from the commercial development of this
+        research."
     </em>
 </blockquote>
