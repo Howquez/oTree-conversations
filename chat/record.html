@@ -9,12 +9,12 @@
     <h1 class="chat-title">Voice Conversation</h1>
     <p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
 
-    {% if player.round_number == 1 %}
+    {{ if player.round_number == 1 }}
     <div class="instructions" id="instructions">
         <p>You'll have a short voice conversation with an AI assistant.</p>
         <p>Click the microphone button below to start, then say "Hello" to begin the conversation.</p>
     </div>
-    {% endif %}
+    {{ endif }}
 
 
     <!-- Product comparison (hidden until tool call) -->

@@ -1,0 +1,82 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/onboarding.css' }}">
+{{ endblock }}
+
+{{ block scripts }}
+<script src="{{ static 'js/audio_check.js' }}"></script>
+{{ endblock }}
+
+{{ block content }}
+
+<div class="container-fluid p-0 m-0">
+    <div class="row p-0 m-0 justify-content-center">
+
+        <div class="col-12 col-lg-8 col-md-10 col overflow-auto p-3 mt-5 mb-5">
+
+            <div class="row justify-content-center mt-3 mx-1 border-0">
+                <div class="card shadow px-5 py-3 border-0">
+
+                    <h5 class="mb-4">
+                        Audio Check
+                    </h5>
+
+                    <p>
+                        Before we begin, please make sure your <strong>speakers or headphones</strong> are ready.
+                        The study involves having a conversation with (i.e., listening and talking to) a voice agent.
+                    </p>
+
+                    <p>
+                        Click play below to listen to a short audio message. It will tell you a word — type that word in the box that appears afterwards.
+                        You can replay the audio as many times as needed.
+                    </p>
+
+                    <audio id="audioPlayer" preload="auto"
+                           src="https://nyustern.az1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_bBDmTkANlWIKk6x">
+                    </audio>
+
+                    <div class="audio-controls">
+                        <button class="audio-play-btn" id="playPauseBtn" type="button">
+                            <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+                        </button>
+
+                        <div class="audio-progress-container" id="progressContainer">
+                            <div class="audio-progress-bar" id="progressBar"></div>
+                        </div>
+
+                        <span class="audio-time" id="timeDisplay">0:00 / 0:00</span>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <button class="btn btn-sm btn-outline-secondary" id="replayBtn" type="button">Replay</button>
+                    </div>
+
+                    <div class="audio-listening-indicator" id="listeningIndicator">
+                        Great! Now please type the word you heard below.
+                    </div>
+
+                    <input type="hidden" name="has_listened" id="id_has_listened" value="">
+
+                    <div id="textareaSection" style="display:none;">
+                        <textarea class="form-control" id="control_question" name="control_question"
+                                  rows="2" placeholder="Type the word you heard here..."></textarea>
+                        {{ formfield_errors 'control_question' }}
+                        <small class="text-danger" id="clientErrorMessage" style="display:none;"></small>
+                    </div>
+
+                    <div id="nextSection" style="display:none;">
+                        <div class="d-flex justify-content-center mt-3 mb-3">
+                            <button class="btn btn-primary shadow" type="submit" id="submitButton">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{ endblock }}

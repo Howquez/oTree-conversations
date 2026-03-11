@@ -27,12 +27,23 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    pass
+    has_listened     = models.StringField(blank=True)
+    control_question = models.StringField(blank=True)
 
 
 # PAGES
 class consent(Page):
     form_model = 'player'
+
+
+class audio_check(Page):
+    form_model  = 'player'
+    form_fields = ['has_listened', 'control_question']
+
+    @staticmethod
+    def error_message(player, values):
+        if values.get('control_question', '').strip().lower() != 'cat':
+            return {'control_question': 'Please listen to the audio carefully and type the correct word.'}
 
 
 class onboarding(Page):
@@ -68,5 +79,6 @@ class onboarding(Page):
 
 page_sequence = [
     consent,
-    onboarding,
+    audio_check,
+    # onboarding,
 ]

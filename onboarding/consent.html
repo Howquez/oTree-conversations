@@ -1,78 +1,9 @@
 {{ block styles }}
-<style>
-    #mic-icon {
-        font-weight: bold;
-    }
-    #mic-icon.granted {
-        color: #22c55e;
-    }
-    #mic-icon.denied {
-        color: #ef4444;
-    }
-    #mic-icon.pending {
-        color: #f59e0b;
-    }
-    #micPermission:disabled {
-        opacity: 0.6;
-    }
-</style>
+<link rel="stylesheet" href="{{ static 'css/onboarding.css' }}">
 {{ endblock }}
 
 {{ block scripts }}
-<script>
-    const micToggle = document.getElementById('micPermission');
-    const micStatus = document.getElementById('mic-status');
-    const micIcon = document.getElementById('mic-icon');
-
-    // Check existing permission status on load
-    if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'microphone' }).then(result => {
-            updatePermissionStatus(result.state);
-            result.onchange = () => updatePermissionStatus(result.state);
-        }).catch(() => {
-            // Permissions API not supported, wait for user action
-        });
-    }
-
-    micToggle.addEventListener('change', async function() {
-        if (this.checked) {
-            try {
-                micStatus.textContent = 'Requesting access...';
-                micIcon.textContent = '';
-                micIcon.className = 'ms-2 pending';
-
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-                // Permission granted - stop the stream immediately (we just needed permission)
-                stream.getTracks().forEach(track => track.stop());
-
-                updatePermissionStatus('granted');
-            } catch (err) {
-                console.log('Microphone permission denied:', err);
-                updatePermissionStatus('denied');
-                this.checked = false;
-            }
-        }
-    });
-
-    function updatePermissionStatus(state) {
-        micIcon.className = 'ms-2 ' + state;
-
-        if (state === 'granted') {
-            micStatus.textContent = 'Microphone access granted';
-            micIcon.textContent = '\u2713';
-            micToggle.checked = true;
-            micToggle.disabled = true;
-        } else if (state === 'denied') {
-            micStatus.textContent = 'Microphone access denied - please enable in browser settings';
-            micIcon.textContent = '\u2717';
-            micToggle.checked = false;
-        } else {
-            micStatus.textContent = 'Click to enable microphone access';
-            micIcon.textContent = '';
-        }
-    }
-</script>
+<script src="{{ static 'js/consent.js' }}"></script>
 {{ endblock }}
 
 {{ block content }}
@@ -107,15 +38,27 @@
                         <tr>
                             <th scope="row">Technical Requirements</th>
                             <td>
-                                We will ask you to provide a voice input. For that reason,
-                                <u class=""> we require you to use a device with a microphone in a quiet and private place</u>.
-                                For the smoothest possible process, we advise using a modern browser other than Safari with a stable
-                                Internet connection.
+                                This study requires you to speak out loud and listen to a voice agent.
                                 <div class="form-check form-switch mt-3">
                                     <input class="form-check-input" type="checkbox" id="micPermission" required>
                                     <label class="form-check-label" for="micPermission">
                                         <span id="mic-status">Click to enable microphone access</span>
                                         <span id="mic-icon" class="ms-2"></span>
+                                    </label>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">For the smoothest experience, we recommend using a modern browser other than Safari with a stable Internet connection.</small>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Environment</th>
+                            <td>
+                                Please make sure you are in a suitable setting for this study.
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="quietPlace" required>
+                                    <label class="form-check-label" for="quietPlace">
+                                        I am currently in a quiet, private place (no background music, no loud surroundings, and no one nearby).
                                     </label>
                                 </div>
                             </td>

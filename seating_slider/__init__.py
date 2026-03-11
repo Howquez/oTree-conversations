@@ -28,6 +28,7 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     choice_pair = models.IntegerField(blank=True)
+    choice = models.StringField(blank=True)
     strength = models.IntegerField(
         doc="Slider response: -50 = strongly prefer Seat A, 0 = no preference, +50 = strongly prefer Seat B.",
         min=-50,
@@ -49,6 +50,7 @@ class Slider(Page):
     def vars_for_template(player: Player):
         current = player.participant.vars['choices'][player.round_number - 1]
         player.choice_pair = int(current['pair_id'])
+        player.choice = player.participant.vars.get('seating_choices', {}).get(player.round_number, '')
         return dict(
             seat_A=current['seat_A'],
             seat_B=current['seat_B'],

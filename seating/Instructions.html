@@ -1,20 +1,53 @@
 {{ block styles }}
-<link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
 <link rel="stylesheet" href="{{ static 'css/seating.css' }}">
+{{ endblock }}
+
+{{ block scripts }}
+<script src="{{ static 'js/instructions.js' }}"></script>
 {{ endblock }}
 
 {{ block content }}
 
-<div class="chat-container">
-    <h1 class="chat-title">Seat Selection Task</h1>
+<div class="container-fluid p-0 m-0">
+    <div class="row p-0 m-0 justify-content-center">
 
-    <div class="instructions">
-        <p>Imagine you are booking a flight for an upcoming vacation. You have reached the seat-selection step, where a voice assistant will help you choose your seat.</p>
-        <p>The assistant will show you pairs of seats one at a time. For each pair, simply say out loud which of the two options you prefer.</p>
-        <p>When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to initiate the conversation.</p>
+        <div class="col-12 col-lg-6 col-md-6 col overflow-auto p-3 mt-5 mb-5">
+
+            <div class="row justify-content-center mt-3 mx-1 border-0">
+                <div class="card shadow px-5 py-3 border-0">
+
+                    <h5>
+                        Seat Selection Task
+                    </h5>
+
+                    <p>
+                        Imagine you are booking a long-haul flight departing at 14:30. You have reached the seat-selection step, where a voice assistant will help you choose your seat.
+                    </p>
+
+                    <p>
+                        Please assume that the flight will be <strong>fully booked</strong>: every seat not selected by you will be occupied by another passenger.
+                    </p>
+
+                    <p>
+                        The assistant will show you pairs of seats one at a time. For each pair, simply say out loud which of the two options you prefer.
+                        For instance, by saying statements such as "I'd go with Option A" or "The window seat looks better to me" — or anything in between.
+                    </p>
+
+                    <p>
+                        When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to start.
+                    </p>
+
+                    <div class="d-flex justify-content-center mt-3 mb-3">
+                        <button class="btn btn-outline-secondary shadow" type="submit" id="submit_button">
+                            Continue
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
-
-    {{ next_button }}
 </div>
 
 {{ endblock }}

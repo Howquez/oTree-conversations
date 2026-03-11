@@ -18,6 +18,7 @@ let markerDestination = null;
 let channelMerger = null;
 let uploadUrlResolver = null;
 let pendingUserMessage = null;
+let submitConfirmed = false;
 let pendingSubmit = false;        // true once submit_page has been called
 let postSubmitResponseCount = 0; // counts response.done events after submit_page
 let botAnalyser = null;          // detects when bot audio goes silent
@@ -30,20 +31,48 @@ let speechSegmentStart = null;
 let totalSpeechMs = 0;
 
 // Elements
-let connectBtn, connectIcon, disconnectIcon, statusText, indicator;
+let connectBtn, statusText, indicator;
 let instructions;
 let chatMessages, chatLogInput, submitButton;
 
 document.addEventListener('DOMContentLoaded', () => {
     connectBtn = document.getElementById('connect-btn');
-    connectIcon = document.getElementById('connect-icon');
-    disconnectIcon = document.getElementById('disconnect-icon');
+
     statusText = document.getElementById('status-text');
     indicator = document.getElementById('recording-indicator');
     instructions = document.getElementById('instructions');
     chatMessages = document.getElementById('chat-messages');
     chatLogInput = document.getElementById('id_chat_log');
     submitButton = document.getElementById('submit_button');
+
+    // Popover warning on manual submit
+    const submitPopover = new bootstrap.Popover(submitButton, {
+        html: true,
+        trigger: 'manual',
+        placement: 'top',
+        content: `
+            <p class="mb-2 small">Only use this if the conversation seems stuck.</p>
+            <button class="btn btn-sm btn-danger w-100" id="confirm-submit">Proceed anyway</button>
+        `,
+    });
+
+    submitButton.addEventListener('click', (e) => {
+        if (!submitConfirmed) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            submitPopover.show();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'confirm-submit') {
+            submitPopover.hide();
+            submitConfirmed = true;
+            autoSubmit();
+        } else if (!submitButton.contains(e.target) && !e.target.closest('.popover')) {
+            submitPopover.hide();
+        }
+    });
 
     buildSeatMap();
 
@@ -57,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auto-start from round 2 onwards
     if (typeof OTREE_ROUND !== 'undefined' && OTREE_ROUND > 1) {
-        showSeatMap();
         requestToken();
     }
 });
@@ -134,6 +162,7 @@ function makeRowLabel(text) {
 function showSeatMap() {
     const wrapper = document.getElementById('seat-map-wrapper');
     if (wrapper && wrapper.style.display === 'none') {
+        document.getElementById('page-title').style.visibility = 'visible';
         wrapper.style.display = 'block';
         wrapper.classList.add('fade-in');
         document.getElementById('seat_map_shown').value = 1;
@@ -224,11 +253,8 @@ async function startWebRTC(ephemeralToken, model) {
         isConnected = true;
         statusText.textContent = 'In conversation';
         indicator.classList.add('active');
-        connectIcon.style.display = 'none';
-        disconnectIcon.style.display = 'block';
-        connectBtn.disabled = false;
+        connectBtn.disabled = true;
         connectBtn.classList.add('active');
-        submitButton.disabled = false;
         if (instructions) instructions.style.display = 'none';
 
     } catch (err) {
@@ -253,12 +279,12 @@ function onDataChannelOpen() {
                 language: 'en',
             },
             tools: [
-                {
+                ...(OTREE_ROUND === 1 ? [{
                     type: 'function',
                     name: 'show_seat_map',
                     description: 'Displays the seat map highlighting the two seats being compared. Call this before asking the user about their preference.',
                     parameters: { type: 'object', properties: {} },
-                },
+                }] : []),
                 {
                     type: 'function',
                     name: 'submit_page',
@@ -269,7 +295,10 @@ function onDataChannelOpen() {
         },
     }));
 
-    // Participant always speaks first — no auto-start needed
+    // Show seat map now that connection is ready (rounds 2+)
+    if (OTREE_ROUND > 1) {
+        showSeatMap();
+    }
 }
 
 function onDataChannelMessage(event) {
@@ -349,6 +378,7 @@ function onDataChannelMessage(event) {
             } else if (msg.name === 'submit_page') {
                 pendingSubmit = true;
                 postSubmitResponseCount = 0;
+                submitButton.disabled = false;
                 dataChannel.send(JSON.stringify({
                     type: 'conversation.item.create',
                     item: {
@@ -381,13 +411,18 @@ function onDataChannelMessage(event) {
 
 // ── Silence detection & auto-submit ──────────────────────────────────────────
 
+function autoSubmit() {
+    submitConfirmed = true;
+    submitButton.click();
+}
+
 function waitForSilenceThenSubmit() {
     const SILENCE_THRESHOLD = 8;      // out of 255
     const SILENCE_DURATION  = 700;    // ms of continuous quiet before submit
     const SAFETY_TIMEOUT    = 10000;  // ms max wait regardless
 
     if (!botAnalyser) {
-        submitButton.click();
+        autoSubmit();
         return;
     }
 
@@ -395,7 +430,7 @@ function waitForSilenceThenSubmit() {
     let silenceStart = null;
 
     const safety = setTimeout(() => {
-        submitButton.click();
+        autoSubmit();
     }, SAFETY_TIMEOUT);
 
     function poll() {
@@ -406,7 +441,7 @@ function waitForSilenceThenSubmit() {
             if (silenceStart === null) silenceStart = performance.now();
             if (performance.now() - silenceStart >= SILENCE_DURATION) {
                 clearTimeout(safety);
-                submitButton.click();
+                autoSubmit();
                 return;
             }
         } else {
@@ -519,8 +554,8 @@ async function disconnect() {
     currentBotMessage = null;
     statusText.textContent = 'Ended';
     indicator.classList.remove('active', 'speaking');
-    connectIcon.style.display = 'block';
-    disconnectIcon.style.display = 'none';
+    connectBtn.disabled = false;
+    connectBtn.classList.remove('active');
     connectBtn.classList.remove('active');
 }
 

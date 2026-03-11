@@ -46,21 +46,21 @@ def _build_system_prompt(seat_a, seat_b, round_number, num_rounds):
         return f"""You are a friendly assistant running a short airline seat survey. Speak in English.
 
 Follow these steps strictly in order:
-1. Greet the user warmly (one sentence).
-2. Ask TWO casual small-talk questions, e.g. about their day or travel plans. STOP and wait for their answer.
-3. After they answer, say one short transition (e.g. "Great! Let me show you two seat options.") and call show_seat_map. Do NOT ask about the seats yet — wait for the tool to complete.
-4. After the tool completes, ask ONCE: "Would you prefer Seat A or Seat B?" Do not repeat this question.
-5. When they answer clearly, call submit_page. Then say one sentence explaining the remaining rounds, e.g. "For the next rounds you'll see two seats on screen each time — just say out loud whether you prefer A or B and we'll move straight on." Then stop."""
+1. Greet the user warmly (one sentence) and always speak English.
+2. Ask ONE warm-up question connecting travel to the study, e.g. "Since we're focusing on seat preferences today, I'm curious — do you have any trips coming up?" STOP and wait for their answer. Then follow up briefly on what they said (one sentence only).
+3. Say one short transition (e.g. "Great! Let me show you two seat options.") and call show_seat_map. Do NOT ask about the seats yet — wait for the tool to complete.
+4. After the tool completes, ask ONCE: "Which of these two seats would you go for?" Do not repeat this question.
+5. When they answer clearly, call submit_page. Then say one sentence explaining the remaining rounds, e.g. "For the next rounds a new pair of seats will appear on screen each time — just say which you'd go for and feel free to share your thinking." Then stop."""
     elif round_number < num_rounds:
         return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English.
 
 The seat map is already on screen. Say nothing — wait silently for the participant to say A or B.
-When they answer clearly, call submit_page. Then say one short sentence bridging to the next round, e.g. "Got it — next pair coming up." Say nothing else."""
+When they answer clearly, call submit_page. Then say one short sentence bridging to the next round, e.g. "Got it — next pair coming up. What are your preferences?" or a slight variation thereof, but say nothing else."""
     else:
         return f"""You are facilitating the final round of a seat survey. Speak in English.
 
 The seat map is already on screen. Say nothing — wait for the participant to say A or B.
-When they answer clearly, call submit_page. Then say one short closing line, e.g. "That's the last one — thanks!" Say nothing else."""
+When they answer clearly, call submit_page. Then say one short closing line, e.g. "That's the last one — thanks! Let's move on to a short survey." Say nothing else."""
 
 
 class C(BaseConstants):
@@ -223,6 +223,8 @@ class record(Page):
         seat_a = current['seat_A']
         seat_b = current['seat_B']
 
+        print(f"[choice] Round {player.round_number} chat_log: {player.chat_log}")
+
         prompt = (
             f"I asked a participant to choose between two airplane seats: "
             f"seat_A called '{seat_a}' and seat_B called '{seat_b}'. "
@@ -252,6 +254,8 @@ class record(Page):
         except Exception as e:
             print(f"Choice classification error: {e}")
             player.choice = 'None'
+
+        player.participant.vars.setdefault('seating_choices', {})[player.round_number] = player.choice
 
 
 page_sequence = [Instructions, record]

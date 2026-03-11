@@ -6,11 +6,7 @@
 {{ block content }}
 
 <div class="chat-container">
-    {{ if player.round_number == 1 }}
-        <h1 class="chat-title">Chat</h1>
-    {{ else }}
-       <h1 class="chat-title">Seat Preference</h1>
-    {{ endif }}
+    <h1 class="chat-title" id="page-title" style="visibility: hidden;">How would you decide in this scenario?</h1>
     <p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
 
     {{ if player.round_number == 1 }}
@@ -60,18 +56,15 @@
     <span class="status-text" id="status-text">Ready</span>
 
     <button type="button" class="pill-btn connect-btn" id="connect-btn" title="Start conversation">
-        <svg id="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
             <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
             <line x1="12" y1="19" x2="12" y2="23"/>
             <line x1="8" y1="23" x2="16" y2="23"/>
         </svg>
-        <svg id="disconnect-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-            <rect x="6" y="6" width="12" height="12" rx="2"/>
-        </svg>
     </button>
 
-    <button type="submit" class="pill-btn next-btn" id="submit_button" title="Finish" disabled>
+    <button type="submit" class="pill-btn next-btn" id="submit_button" title="Continue">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14"/>
             <path d="M12 5l7 7-7 7"/>
