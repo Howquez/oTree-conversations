@@ -289,7 +289,17 @@ function onDataChannelOpen() {
                     type: 'function',
                     name: 'submit_page',
                     description: 'Advances to the next round. Call this only after the user has given a clear, definitive preference for one of the two seats.',
-                    parameters: { type: 'object', properties: {} },
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            choice: {
+                                type: 'string',
+                                enum: ['seat_A', 'seat_B'],
+                                description: 'Which seat the participant chose.',
+                            },
+                        },
+                        required: ['choice'],
+                    },
                 },
             ],
         },
@@ -379,6 +389,11 @@ function onDataChannelMessage(event) {
                 pendingSubmit = true;
                 postSubmitResponseCount = 0;
                 submitButton.disabled = false;
+                const args = msg.arguments ? JSON.parse(msg.arguments) : {};
+                if (args.choice) {
+                    const choiceInput = document.getElementById('id_choice');
+                    if (choiceInput) choiceInput.value = args.choice;
+                }
                 dataChannel.send(JSON.stringify({
                     type: 'conversation.item.create',
                     item: {

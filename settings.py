@@ -18,7 +18,7 @@ SESSION_CONFIGS = [
     # ),
     dict(
         name='seat_preference',
-        app_sequence=['seating', 'seating_slider', 'outro'],
+        app_sequence=['onboarding', 'seating', 'seating_slider', 'outro'],
         num_demo_participants=3,
     ),
 ]

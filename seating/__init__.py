@@ -110,7 +110,7 @@ class Instructions(Page):
 
 class record(Page):
     form_model = 'player'
-    form_fields = ['chat_log', 'seat_map_shown', 'screen_width', 'screen_height', 'touch_capable',
+    form_fields = ['chat_log', 'choice', 'seat_map_shown', 'screen_width', 'screen_height', 'touch_capable',
                    'response_onset_ms', 'response_duration_ms', 'webrtc_stats', 'time_on_page_ms', 'user_agent']
 
     @staticmethod
@@ -215,46 +215,8 @@ class record(Page):
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
-        if not player.chat_log:
+        if not player.choice:
             player.choice = 'None'
-            return
-
-        current = player.participant.vars['choices'][player.round_number - 1]
-        seat_a = current['seat_A']
-        seat_b = current['seat_B']
-
-        print(f"[choice] Round {player.round_number} chat_log: {player.chat_log}")
-
-        prompt = (
-            f"I asked a participant to choose between two airplane seats: "
-            f"seat_A called '{seat_a}' and seat_B called '{seat_b}'. "
-            f"The following is a JSON transcript of the voice conversation. "
-            f"Based on the conversation, which seat did the participant choose? "
-            f"Strictly respond with 'seat_A' or 'seat_B'. "
-            f"If no choice can be determined, respond with 'None'.\n"
-            f"Conversation: {player.chat_log}"
-        )
-
-        try:
-            OPENAI_KEY = os.environ.get('WHISPER_KEY')
-            with httpx.Client() as client:
-                response = client.post(
-                    'https://api.openai.com/v1/chat/completions',
-                    headers={
-                        'Authorization': f'Bearer {OPENAI_KEY}',
-                        'Content-Type': 'application/json',
-                    },
-                    json={
-                        'model': 'gpt-4o-mini',
-                        'messages': [{'role': 'user', 'content': prompt}],
-                        'max_tokens': 10,
-                    }
-                )
-            player.choice = response.json()['choices'][0]['message']['content'].strip()
-        except Exception as e:
-            print(f"Choice classification error: {e}")
-            player.choice = 'None'
-
         player.participant.vars.setdefault('seating_choices', {})[player.round_number] = player.choice
 
 
