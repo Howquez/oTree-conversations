@@ -1,5 +1,10 @@
 from otree.api import *
 import random
+import os
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
 
 doc = """
 Your app description
@@ -180,6 +185,7 @@ class Player(BasePlayer):
 
 # OTF
     OTF = models.LongStringField(label="Please use the box below to share your thoughts about the study (e.g., any aspects you particularly liked or disliked) to help us improve it.", blank=False)
+    OTF_input_mode = models.StringField(blank=True, initial='text')
 
 
 
@@ -216,9 +222,59 @@ class Demographics(Page):
         player.participant.finished = True
         player.completed_survey = player.participant.finished
 
+_OTF_SYSTEM_PROMPT = """You are collecting open-ended feedback about a research study. Say exactly this once: "Please share any thoughts about the study — for example, aspects you particularly liked, disliked, or anything that could help us improve it." Then listen quietly. When the participant has clearly finished speaking, call submit_feedback with their verbatim words. Do not add commentary or paraphrase — capture everything they said word for word."""
+
+
 class Open_Text(Page):
     form_model = "player"
-    form_fields = ["OTF"]
+    form_fields = ["OTF", "OTF_input_mode"]
+
+    @staticmethod
+    async def live_method(player: Player, data):
+        if data.get('type') == 'otf_token':
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        'https://api.openai.com/v1/realtime/sessions',
+                        headers={
+                            'Authorization': f'Bearer {os.environ.get("WHISPER_KEY")}',
+                            'Content-Type': 'application/json',
+                        },
+                        json={
+                            'model': 'gpt-realtime-1.5',
+                            'voice': 'cedar',
+                            'instructions': _OTF_SYSTEM_PROMPT,
+                            'input_audio_transcription': {
+                                'model': 'whisper-1',
+                                'language': 'en',
+                            },
+                            'tools': [
+                                {
+                                    'type': 'function',
+                                    'name': 'submit_feedback',
+                                    'description': 'Stores the participant\'s verbatim feedback. Call this when they have clearly finished speaking.',
+                                    'parameters': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'transcript': {
+                                                'type': 'string',
+                                                'description': 'Verbatim transcript of everything the participant said.',
+                                            },
+                                        },
+                                        'required': ['transcript'],
+                                    },
+                                },
+                            ],
+                        },
+                    )
+                result = response.json()
+                yield {player.id_in_group: {
+                    'type': 'token',
+                    'token': result.get('client_secret', {}).get('value', ''),
+                }}
+            except Exception as e:
+                print(f"[OTF voice] Error: {e}")
+                yield {player.id_in_group: {'type': 'error', 'message': 'Could not start voice session.'}}
 
 class Other_Ideas(Page):
     form_model = "player"

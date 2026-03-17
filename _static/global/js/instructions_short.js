@@ -5,4 +5,4 @@ submitButton.disabled = true;
 setTimeout(() => {
     submitButton.disabled = false;
     submitButton.className = "btn btn-primary shadow"
-}, 15000);
+}, 6000);

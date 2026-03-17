@@ -4,6 +4,7 @@ from botocore.config import Config as BotoConfig
 import os
 import httpx
 import random
+import hashlib
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -43,24 +44,26 @@ def _describe_seat(seat_id):
 
 def _build_system_prompt(seat_a, seat_b, round_number, num_rounds):
     if round_number == 1:
-        return f"""You are a friendly assistant running a short airline seat survey. Speak in English.
+        return f"""You are a friendly assistant running a short airline seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
 
 Follow these steps strictly in order:
-1. Greet the user warmly (one sentence) and always speak English.
-2. Ask ONE warm-up question connecting travel to the study, e.g. "Since we're focusing on seat preferences today, I'm curious — do you have any trips coming up?" STOP and wait for their answer. Then follow up briefly on what they said (one sentence only).
-3. Say one short transition (e.g. "Great! Let me show you two seat options.") and call show_seat_map. Do NOT ask about the seats yet — wait for the tool to complete.
-4. After the tool completes, ask ONCE: "Which of these two seats would you go for?" Do not repeat this question.
-5. When they answer clearly, call submit_page. Then say one sentence explaining the remaining rounds, e.g. "For the next rounds a new pair of seats will appear on screen each time — just say which you'd go for and feel free to share your thinking." Then stop."""
+1. Greet the user in one sentence only.
+2. Give a SHORT introduction. Then ask ONE warm-up question, e.g. "We'll talking about seat preferences today — so I was wondering: do you fly often?" Wait for their answer. Follow up in one sentence only.
+3. Call show_seat_map immediately — say nothing before or after until the tool completes.
+4. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Do not repeat this question.
+5. When they answer, call submit_page. Then say one sentence only, e.g. "For the next rounds I'll ask the same question, then the map appears — just answer freely." Stop."""
     elif round_number < num_rounds:
-        return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English.
+        return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
 
-The seat map is already on screen. Say nothing — wait silently for the participant to say A or B.
-When they answer clearly, call submit_page. Then say one short sentence bridging to the next round, e.g. "Got it — next pair coming up. What are your preferences?" or a slight variation thereof, but say nothing else."""
+Follow these steps strictly in order:
+1. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Then immediately call show_seat_map. Wait silently for the participant to respond.
+2. When they answer, call submit_page. Say one short bridging sentence only, e.g. "Got it — next one coming up." Say nothing else."""
     else:
-        return f"""You are facilitating the final round of a seat survey. Speak in English.
+        return f"""You are facilitating the final round of a seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
 
-The seat map is already on screen. Say nothing — wait for the participant to say A or B.
-When they answer clearly, call submit_page. Then say one short closing line, e.g. "That's the last one — thanks! Let's move on to a short survey." Say nothing else."""
+Follow these steps strictly in order:
+1. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Then immediately call show_seat_map. Wait silently for the participant to respond.
+2. When they answer, call submit_page. Say one short closing sentence only, e.g. "That's the last one — thanks!" Say nothing else."""
 
 
 class C(BaseConstants):
@@ -97,7 +100,8 @@ def creating_session(subsession):
     if subsession.round_number == 1:
         for player in subsession.get_players():
             choices = list(_STIMULI)
-            rng = random.Random(player.participant.id_in_session)
+            seed = int(hashlib.md5(player.participant.code.encode()).hexdigest(), 16)
+            rng = random.Random(seed)
             rng.shuffle(choices)
             player.participant.vars['choices'] = choices
 
@@ -145,8 +149,8 @@ class record(Page):
                             'Content-Type': 'application/json',
                         },
                         json={
-                            'model': 'gpt-4o-realtime-preview',
-                            'voice': 'verse',
+                            'model': 'gpt-realtime-1.5',
+                            'voice': 'cedar', # or 'marin" as suggested here: https://developers.openai.com/api/docs/guides/realtime-conversations/#voice-options
                             'instructions': system_prompt,
                             'input_audio_transcription': {
                                 'model': 'whisper-1',
@@ -170,7 +174,7 @@ class record(Page):
                 yield {player.id_in_group: {
                     'type': 'token',
                     'token': result.get('client_secret', {}).get('value', ''),
-                    'model': 'gpt-4o-realtime-preview',
+                    'model': 'gpt-realtime-1.5',
                 }}
 
             except Exception as e:
@@ -218,6 +222,7 @@ class record(Page):
         if not player.choice:
             player.choice = 'None'
         player.participant.vars.setdefault('seating_choices', {})[player.round_number] = player.choice
+        player.participant.vars.setdefault('seating_choices_by_pair', {})[player.choice_pair] = player.choice
 
 
 page_sequence = [Instructions, record]

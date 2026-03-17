@@ -1,0 +1,90 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
+<link rel="stylesheet" href="{{ static 'global/css/flight_card.css' }}">
+<link rel="stylesheet" href="{{ static 'css/seating_discount.css' }}">
+{{ endblock }}
+
+
+{{ block content }}
+
+<div class="chat-container">
+    <h1 class="chat-title" id="page-title" style="visibility: hidden;">Would you switch for a discount?</h1>
+    <p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
+
+    <!-- Seat map placeholder (visible until tool call) -->
+    <div id="seat-map-placeholder">
+        <div class="smp-inner">
+            <span class="smp-dots"><span></span><span></span><span></span></span>
+            Preparing seat map…
+        </div>
+    </div>
+
+    <!-- Seat map (hidden until tool call) -->
+    <div id="seat-map-wrapper" style="display: none;">
+        <div class="seat-map-legend">
+            <span class="legend-dot option-a-dot"></span> Seat A
+            &nbsp;&nbsp;
+            <span class="legend-dot option-b-dot"></span> Seat B
+        </div>
+        <div class="seat-map-scroll">
+            <div id="seat-map"></div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="chat_log" id="id_chat_log" value="">
+<input type="hidden" name="choice" id="id_choice" value="">
+<input type="hidden" name="seat_map_shown" id="seat_map_shown" value="0">
+<input type="hidden" name="screen_width" id="screen_width" value="">
+<input type="hidden" name="screen_height" id="screen_height" value="">
+<input type="hidden" name="touch_capable" id="touch_capable" value="0">
+<input type="hidden" name="response_onset_ms" id="response_onset_ms" value="">
+<input type="hidden" name="response_duration_ms" id="response_duration_ms" value="">
+<input type="hidden" name="webrtc_stats" id="webrtc_stats" value="">
+<input type="hidden" name="time_on_page_ms" id="time_on_page_ms" value="">
+<input type="hidden" name="user_agent" id="user_agent" value="">
+<script>
+    document.getElementById('screen_width').value = window.screen.width;
+    document.getElementById('screen_height').value = window.screen.height;
+    document.getElementById('touch_capable').value = (navigator.maxTouchPoints > 0) ? 1 : 0;
+    document.getElementById('user_agent').value = navigator.userAgent;
+</script>
+
+<div class="my-2" id="chat-messages" style="display: none;"></div>
+
+{% include 'global/flight_footer.html' %}
+
+<div class="pill-spacer"></div>
+
+<!-- Floating Voice Pill -->
+<div class="voice-pill">
+    <div class="recording-indicator" id="recording-indicator"></div>
+    <span class="status-text" id="status-text">Ready</span>
+
+    <button type="button" class="pill-btn connect-btn" id="connect-btn" title="Start conversation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+    </button>
+
+    <button type="submit" class="pill-btn next-btn" id="submit_button" title="Continue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"/>
+            <path d="M12 5l7 7-7 7"/>
+        </svg>
+    </button>
+</div>
+
+<script>
+    const OTREE_ROUND = {{ player.round_number }};
+    const SEAT_A = "{{ seat_A }}";
+    const SEAT_B = "{{ seat_B }}";
+    const DISCOUNT_SEAT = "{{ discount_seat }}";
+    const DISCOUNT_AMOUNT = {{ discount_amount }};
+</script>
+<script src="{{ static 'js/seating_discount.js' }}"></script>
+
+{{ endblock }}

@@ -1,9 +1,10 @@
 {{ block styles }}
 <link rel="stylesheet" href="{{ static 'css/seating.css' }}">
+<link rel="stylesheet" href="{{ static 'global/css/flight_card.css' }}">
 {{ endblock }}
 
 {{ block scripts }}
-<script src="{{ static 'js/instructions.js' }}"></script>
+<script src="{{ static 'global/js/instructions.js' }}"></script>
 {{ endblock }}
 
 {{ block content }}
@@ -11,40 +12,40 @@
 <div class="container-fluid p-0 m-0">
     <div class="row p-0 m-0 justify-content-center">
 
-        <div class="col-12 col-lg-6 col-md-6 col overflow-auto p-3 mt-5 mb-5">
+        <div class="col-12 col-lg-7 col-md-9 p-3 mt-4 mb-5">
 
-            <div class="row justify-content-center mt-3 mx-1 border-0">
-                <div class="card shadow px-5 py-3 border-0">
+            <div class="card shadow px-4 py-3 border-0 mb-3">
 
-                    <h5>
-                        Seat Selection Task
-                    </h5>
+                <h5>Seat Selection Task</h5>
 
-                    <p>
-                        Imagine you are booking a long-haul flight departing at 14:30. You have reached the seat-selection step, where a voice assistant will help you choose your seat.
-                    </p>
+                <p>
+                    Imagine you have just booked the flight shown below for a <strong>private trip</strong>. You have reached the seat-selection step, where a voice assistant will help you choose your seat.
+                </p>
 
-                    <p>
-                        Please assume that the flight will be <strong>fully booked</strong>: every seat not selected by you will be occupied by another passenger.
-                    </p>
+                <p>
+                    Please assume that the flight will be fully booked: every seat not selected by you will be occupied by another passenger.
+                </p>
 
-                    <p>
-                        The assistant will show you pairs of seats one at a time. For each pair, simply say out loud which of the two options you prefer.
-                        For instance, by saying statements such as "I'd go with Option A" or "The window seat looks better to me" — or anything in between.
-                    </p>
+                <p>
+                    The assistant will show you six pairs of seats. <strong>For each pair, simply say out loud which of the two options you prefer.</strong>
+                    For instance, by saying statements such as "I'd go with Option A" or "The window seat looks better to me" — or anything in between.
+                </p>
 
-                    <p>
-                        When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to start.
-                    </p>
+                <p>
+                    When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to start.
+                    From the second pair onwards, the assistant will ask you which seat you prefer before showing the map — just answer once the map appears.
+                </p>
 
-                    <div class="d-flex justify-content-center mt-3 mb-3">
-                        <button class="btn btn-outline-secondary shadow" type="submit" id="submit_button">
-                            Continue
-                        </button>
-                    </div>
-
+                <div class="d-flex justify-content-center mt-3 mb-2">
+                    <button class="btn btn-outline-secondary shadow" type="submit" id="submit_button">
+                        Continue
+                    </button>
                 </div>
+
             </div>
+
+            {% include 'global/flight_card.html' %}
+
         </div>
 
     </div>

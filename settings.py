@@ -1,24 +1,9 @@
 from os import environ
 
 SESSION_CONFIGS = [
-    # dict(
-    #     name='voice_decision',
-    #     app_sequence=['onboarding', 'voice', 'outro'],
-    #     num_demo_participants=3,
-    # ),
-    dict(
-        name='voice_chat',
-        app_sequence=['chat', 'outro'],
-        num_demo_participants=3,
-    ),
-    # dict(
-    #     name='voice_chat_eleven',
-    #     app_sequence=['eleven', 'outro'],
-    #     num_demo_participants=3,
-    # ),
     dict(
         name='seat_preference',
-        app_sequence=['onboarding', 'seating', 'seating_slider', 'outro'],
+        app_sequence=['onboarding', 'seating', 'seating_discount', 'seating_slider', 'seating_discount_slider', 'outro'],
         num_demo_participants=3,
     ),
 ]
@@ -36,7 +21,7 @@ SESSION_CONFIG_DEFAULTS = dict(
 )
 
 PARTICIPANT_FIELDS = ["finished"]
-SESSION_FIELDS = []
+SESSION_FIELDS = ["prolific_completion_url"]
 
 ROOMS = [
     dict(

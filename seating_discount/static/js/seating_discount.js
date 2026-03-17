@@ -84,10 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Auto-start from round 2 onwards
-    if (typeof OTREE_ROUND !== 'undefined' && OTREE_ROUND > 1) {
-        requestToken();
-    }
+    // Always auto-start
+    requestToken();
 });
 
 // ── Seat map ─────────────────────────────────────────────────────────────────
@@ -132,6 +130,14 @@ function buildSeatMap() {
                 seat.id = `seat-${seatId}`;
                 if (seatId === SEAT_A) { seat.classList.add('option-a'); seat.textContent = 'A'; }
                 else if (seatId === SEAT_B) { seat.classList.add('option-b'); seat.textContent = 'B'; }
+                if ((DISCOUNT_SEAT === 'seat_A' && seatId === SEAT_A) ||
+                    (DISCOUNT_SEAT === 'seat_B' && seatId === SEAT_B)) {
+                    seat.classList.add('discounted');
+                    const badge = document.createElement('span');
+                    badge.className = 'discount-badge';
+                    badge.textContent = `-$${DISCOUNT_AMOUNT}`;
+                    seat.appendChild(badge);
+                }
                 rowEl.appendChild(seat);
             }
         });
@@ -215,7 +221,6 @@ async function startWebRTC(ephemeralToken, model) {
             audioEl.srcObject = event.streams[0];
             const botSource = audioContext.createMediaStreamSource(event.streams[0]);
             botSource.connect(channelMerger, 0, 1);
-            // Tap an analyser for silence detection
             botAnalyser = audioContext.createAnalyser();
             botAnalyser.fftSize = 512;
             botSource.connect(botAnalyser);
@@ -308,14 +313,12 @@ function onDataChannelOpen() {
         },
     }));
 
-    // Seat map is shown via show_seat_map tool call for all rounds
-    // Fallback: show map after 5 s if the tool call never arrives (rounds 2+ only)
-    if (OTREE_ROUND > 1) setTimeout(() => showSeatMap(), 5000);
+    // Seat map is shown via show_seat_map tool call
+    // Fallback: show map after 5 s if the tool call never arrives
+    setTimeout(() => showSeatMap(), 5000);
 
-    // For rounds 2+, trigger the agent to start speaking immediately
-    if (OTREE_ROUND > 1) {
-        dataChannel.send(JSON.stringify({ type: 'response.create' }));
-    }
+    // Always trigger agent to start speaking immediately
+    dataChannel.send(JSON.stringify({ type: 'response.create' }));
 }
 
 function onDataChannelMessage(event) {
@@ -380,7 +383,6 @@ function onDataChannelMessage(event) {
 
         case 'response.function_call_arguments.done':
             if (msg.name === 'show_seat_map') {
-                injectMarkerTone();
                 showSeatMap();
                 dataChannel.send(JSON.stringify({
                     type: 'conversation.item.create',
@@ -496,18 +498,6 @@ function addMessage(role, text) {
     return bubble;
 }
 
-function injectMarkerTone() {
-    if (!audioContext || !channelMerger) return;
-    const osc = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    osc.frequency.value = 18000;
-    gain.gain.value = 0.15;
-    osc.connect(gain);
-    gain.connect(channelMerger, 0, 0);
-    gain.connect(channelMerger, 0, 1);
-    osc.start();
-    osc.stop(audioContext.currentTime + 0.2);
-}
 
 function saveToChatHistory(role, text) {
     chatHistory.push({ role, text });

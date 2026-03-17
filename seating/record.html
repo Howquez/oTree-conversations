@@ -16,6 +16,16 @@
     </div>
     {{ endif }}
 
+    <!-- Seat map placeholder (rounds 2+ only — round 1 has smalltalk first) -->
+    {% if player.round_number > 1 %}
+    <div id="seat-map-placeholder">
+        <div class="smp-inner">
+            <span class="smp-dots"><span></span><span></span><span></span></span>
+            Preparing seat map…
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Seat map (hidden until tool call) -->
     <div id="seat-map-wrapper" style="display: none;">
         <div class="seat-map-legend">

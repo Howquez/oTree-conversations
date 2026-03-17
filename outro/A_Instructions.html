@@ -1,3 +1,7 @@
+{{ block scripts }}
+<script src="{{ static 'global/js/instructions_short.js' }}"></script>
+{{ endblock }}
+
 {{ block content }}
 
 <div class="container-fluid p-0 m-0">
@@ -18,7 +22,7 @@
                     </p>
 
                     <div class="d-flex justify-content-center mt-3 mb-3">
-                        <button class="btn btn-primary shadow" type="submit" id="submit_button">
+                        <button class="btn btn-outline-secondary shadow" type="submit" id="submit_button">
                             Start Questionnaire
                         </button>
                     </div>

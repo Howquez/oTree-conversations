@@ -1,31 +1,145 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'global/css/record.css' }}">
+<style>
+.otf-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+.otf-toggle-btn {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+.otf-toggle-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.otf-toggle-btn.active {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.otf-preview-box {
+    display: none;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+.otf-preview-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #16a34a;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+#otf-transcript-preview {
+    font-size: 14px;
+    color: #111827;
+    line-height: 1.6;
+}
+</style>
+{{ endblock }}
+
 {{ block content }}
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-sm-10 col-md-10 col-lg-6">
-                <!-- Decision Card -->
-                <div class="card rounded mt-5 shadow-lg">
-                    <div class="card-body">
-                        <h4 class="mb-0">
-                            Feedback.
-                        </h4>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-sm-10 col-md-10 col-lg-6">
+            <div class="card rounded mt-5 shadow-lg">
+                <div class="card-body">
 
-                        <p class="mt-4">
-                            <small>
-                                {{ formfields }}
-                            </small>
-                        </p>
+                    <h4 class="mb-3">Feedback.</h4>
 
-                        <div class="d-flex justify-content-center m-3">
+                    <p class="text-muted small mb-3">
+                        Please share your thoughts about the study — for example, aspects you particularly liked, disliked, or anything that could help us improve it.
+                    </p>
+
+                    <!-- Mode toggle -->
+                    <div class="otf-toggle">
+                        <button type="button" class="otf-toggle-btn active" id="btn-text-mode">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Type
+                        </button>
+                        <button type="button" class="otf-toggle-btn" id="btn-voice-mode">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                            Speak
+                        </button>
+                    </div>
+
+                    <!-- Text mode -->
+                    <div id="otf-text-section">
+                        <textarea name="OTF" id="id_OTF" class="form-control" rows="5" placeholder="Type your feedback here…"></textarea>
+                        {{ formfield_errors 'OTF' }}
+                        <div class="d-flex justify-content-center mt-3">
                             <button class="btn btn-primary shadow" type="submit" id="submitButton">
                                 Submit
                             </button>
                         </div>
                     </div>
+
+                    <!-- Voice mode -->
+                    <div id="otf-voice-section" style="display: none;">
+                        <p class="text-muted small mb-3">
+                            Click the microphone button below, then speak freely. The assistant will confirm when it has captured your feedback.
+                        </p>
+
+                        <div class="otf-preview-box" id="otf-preview-box">
+                            <div class="otf-preview-label">Captured feedback</div>
+                            <div id="otf-transcript-preview"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-3">
+                            <button class="btn btn-primary shadow" type="submit" id="submitButton-voice" disabled>
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="OTF_input_mode" id="id_OTF_input_mode" value="text">
+
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="pill-spacer" id="pill-spacer" style="display: none;"></div>
+
+<!-- Floating voice pill (voice mode only) -->
+<div class="voice-pill" id="voice-pill" style="display: none;">
+    <div class="recording-indicator" id="recording-indicator"></div>
+    <span class="status-text" id="status-text">Ready</span>
+    <button type="button" class="pill-btn connect-btn" id="connect-btn" title="Start">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+    </button>
+</div>
+
+<script src="{{ static 'js/otf_voice.js' }}"></script>
 
 {{ endblock }}
-
