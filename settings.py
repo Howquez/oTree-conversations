@@ -6,6 +6,13 @@ SESSION_CONFIGS = [
         app_sequence=['onboarding', 'seating', 'seating_discount', 'seating_slider', 'seating_discount_slider', 'outro'],
         num_demo_participants=3,
     ),
+    dict(
+        name='seat_preference_short',
+        app_sequence=['onboarding',
+                      'seating', 'seating_discount',
+                      'outro'],
+        num_demo_participants=3,
+    ),
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs

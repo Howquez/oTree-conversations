@@ -44,26 +44,24 @@ def _describe_seat(seat_id):
 
 def _build_system_prompt(seat_a, seat_b, round_number, num_rounds):
     if round_number == 1:
-        return f"""You are a friendly assistant running a short airline seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
+        return f"""You are a friendly assistant running a short airline seat survey. Speak in English. Never speak more than 3 sentences in a single turn.
 
 Follow these steps strictly in order:
 1. Greet the user in one sentence only.
-2. Give a SHORT introduction. Then ask ONE warm-up question, e.g. "We'll talking about seat preferences today — so I was wondering: do you fly often?" Wait for their answer. Follow up in one sentence only.
+2. Give a SHORT introduction. Then ask ONE warm-up question, e.g. "We'll talking about seat preferences today — so I was wondering: do you fly often?" Wait for their answer. Follow up in one sentence only. Then transition to the question about seat preferences.
 3. Call show_seat_map immediately — say nothing before or after until the tool completes.
 4. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Do not repeat this question.
 5. When they answer, call submit_page. Then say one sentence only, e.g. "For the next rounds I'll ask the same question, then the map appears — just answer freely." Stop."""
     elif round_number < num_rounds:
-        return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
+        return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English. Never speak more than 1 sentence per turn.
 
-Follow these steps strictly in order:
-1. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Then immediately call show_seat_map. Wait silently for the participant to respond.
-2. When they answer, call submit_page. Say one short bridging sentence only, e.g. "Got it — next one coming up." Say nothing else."""
+Ask ONCE: "Which of these two seats would you go for, and what draws you to it?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+When they answer, call submit_page. Say one short sentence only, e.g. "Got it." Say nothing else."""
     else:
-        return f"""You are facilitating the final round of a seat survey. Speak in English. Never speak more than 2 sentences in a single turn.
+        return f"""You are facilitating the final round of a seat survey. Speak in English. Never speak more than 1 sentence per turn.
 
-Follow these steps strictly in order:
-1. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Then immediately call show_seat_map. Wait silently for the participant to respond.
-2. When they answer, call submit_page. Say one short closing sentence only, e.g. "That's the last one — thanks!" Say nothing else."""
+Ask ONCE: "Which of these two seats would you go for, and what draws you to it?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+When they answer, call submit_page. Say one short closing sentence only, e.g. "That's the last one — thanks!" Say nothing else."""
 
 
 class C(BaseConstants):

@@ -40,11 +40,10 @@ _COL_LABEL = {
 
 def _build_system_prompt(discount_seat_label, round_number, num_rounds):
     bridging = "Got it — one more coming up." if round_number < num_rounds else "That's it — thanks! Let's move on to a short survey."
-    return f"""You are facilitating a seat discount question. Speak in English. Never speak more than 2 sentences in a single turn.
+    return f"""You are facilitating a seat discount question. Speak in English. Never speak more than 1 sentence per turn.
 
-Follow these steps strictly in order:
-1. Ask ONCE: "Seat {discount_seat_label} is now ${_DISCOUNT_AMOUNT} cheaper — would you switch, or stick with your original choice, and why?" Then immediately call show_seat_map. Wait silently for the participant to respond.
-2. When they answer, call submit_page. Then say: "{bridging}" Say nothing else."""
+Ask ONCE: "Seat {discount_seat_label} is now ${_DISCOUNT_AMOUNT} cheaper — would you switch, or stick with your original choice, and why?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+When they answer, call submit_page. Then say: "{bridging}" Say nothing else."""
 
 
 class C(BaseConstants):

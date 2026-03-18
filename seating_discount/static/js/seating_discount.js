@@ -392,7 +392,7 @@ function onDataChannelMessage(event) {
                         output: JSON.stringify({ success: true }),
                     },
                 }));
-                dataChannel.send(JSON.stringify({ type: 'response.create' }));
+                // Map is shown — just wait for participant, no response needed
 
             } else if (msg.name === 'submit_page') {
                 pendingSubmit = true;
@@ -431,6 +431,16 @@ function onDataChannelMessage(event) {
                     pendingSubmit = false;
                     waitForSilenceThenSubmit();
                 }
+            } else if (seatMapShownAt === null) {
+                // Wait for bot audio to finish, then force turn 2 to call show_seat_map
+                waitForBotSilenceThen(() => {
+                    dataChannel.send(JSON.stringify({
+                        type: 'response.create',
+                        response: {
+                            tool_choice: { type: 'function', function: { name: 'show_seat_map' } },
+                        },
+                    }));
+                });
             }
             break;
 
@@ -447,42 +457,35 @@ function autoSubmit() {
     submitButton.click();
 }
 
-function waitForSilenceThenSubmit() {
-    const SILENCE_THRESHOLD = 8;      // out of 255
-    const SILENCE_DURATION  = 700;    // ms of continuous quiet before submit
-    const SAFETY_TIMEOUT    = 10000;  // ms max wait regardless
+function waitForBotSilenceThen(fn, silenceDuration = 500, safetyTimeout = 8000) {
+    const SILENCE_THRESHOLD = 8;
 
-    if (!botAnalyser) {
-        autoSubmit();
-        return;
-    }
+    if (!botAnalyser) { fn(); return; }
 
     const buf = new Uint8Array(botAnalyser.frequencyBinCount);
     let silenceStart = null;
-
-    const safety = setTimeout(() => {
-        autoSubmit();
-    }, SAFETY_TIMEOUT);
+    const safety = setTimeout(() => fn(), safetyTimeout);
 
     function poll() {
         botAnalyser.getByteFrequencyData(buf);
         const peak = Math.max(...buf);
-
         if (peak < SILENCE_THRESHOLD) {
             if (silenceStart === null) silenceStart = performance.now();
-            if (performance.now() - silenceStart >= SILENCE_DURATION) {
+            if (performance.now() - silenceStart >= silenceDuration) {
                 clearTimeout(safety);
-                autoSubmit();
+                fn();
                 return;
             }
         } else {
             silenceStart = null;
         }
-
         requestAnimationFrame(poll);
     }
+    poll();
+}
 
-    requestAnimationFrame(poll);
+function waitForSilenceThenSubmit() {
+    waitForBotSilenceThen(autoSubmit, 700, 10000);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
