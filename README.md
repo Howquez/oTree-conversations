@@ -7,11 +7,18 @@ An oTree project for running behavioral experiments with conversational voice in
 | App | Description |
 |-----|-------------|
 | `onboarding` | GDPR-compliant consent flow and microphone test |
-| `seating` | Voice-agent seat-preference survey (OpenAI Realtime API) |
-| `seating_slider` | Post-conversation preference-strength slider follow-up |
-| `chat` | General-purpose voice chat (OpenAI Realtime API) |
-| `voice` | STT-based voice response (Whisper API) |
-| `outro` | Post-experiment questionnaire |
+| `seating` | Voice-agent seat-preference survey — 6 pairs, OpenAI Realtime API |
+| `seating_discount` | Voice-agent discount follow-up — 2 previously unchosen seats offered at $25 off |
+| `seating_slider` | Slider rating of preference strength for the 6 seating pairs |
+| `seating_discount_slider` | Slider rating of preference strength for the 2 discount pairs |
+| `outro` | Post-experiment questionnaire with optional voice feedback (OTF) |
+
+### Session configurations
+
+| Config | App sequence |
+|--------|-------------|
+| `seat_preference` | onboarding → seating → seating_discount → seating_slider → seating_discount_slider → outro |
+| `seat_preference_short` | onboarding → seating → seating_discount → outro |
 
 ## Setup
 
