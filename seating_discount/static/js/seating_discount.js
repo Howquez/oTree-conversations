@@ -165,6 +165,19 @@ function makeRowLabel(text) {
     return el;
 }
 
+function injectMarkerTone() {
+    if (!audioContext || !channelMerger) return;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.frequency.value = 18000;
+    gain.gain.value = 0.15;
+    osc.connect(gain);
+    gain.connect(channelMerger, 0, 0);
+    gain.connect(channelMerger, 0, 1);
+    osc.start();
+    osc.stop(audioContext.currentTime + 0.2);
+}
+
 function showSeatMap() {
     const wrapper = document.getElementById('seat-map-wrapper');
     if (wrapper && wrapper.style.display === 'none') {
@@ -383,6 +396,7 @@ function onDataChannelMessage(event) {
 
         case 'response.function_call_arguments.done':
             if (msg.name === 'show_seat_map') {
+                injectMarkerTone();
                 showSeatMap();
                 dataChannel.send(JSON.stringify({
                     type: 'conversation.item.create',
