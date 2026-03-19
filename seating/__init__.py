@@ -51,16 +51,16 @@ Follow these steps strictly in order:
 2. Give a SHORT introduction. Then ask ONE warm-up question, e.g. "We'll talking about seat preferences today — so I was wondering: do you fly often?" Wait for their answer. Follow up in one sentence only. Then transition to the question about seat preferences.
 3. Call show_seat_map immediately — say nothing before or after until the tool completes.
 4. Ask ONCE: "Which of these two seats would you go for — and what draws you to it?" or a variation of that question. Do not repeat this question.
-5. When they answer, call submit_page. Then say one sentence only, e.g. "For the next rounds I'll ask the same question, then the map appears — just answer freely." Stop."""
+5. When they answer, call submit_page. Then say one sentence only, e.g. "For the next rounds I'll ask the same question, then a map with a new pair of seats appears — just answer freely and in full sentences." Stop."""
     elif round_number < num_rounds:
         return f"""You are facilitating round {round_number} of {num_rounds} of a seat survey. Speak in English. Never speak more than 1 sentence per turn.
 
-Ask ONCE: "Which of these two seats would you go for, and what draws you to it?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+Ask ONCE which seat they'd prefer — vary the phrasing naturally each round, e.g. "Which of these two would you go for?", "Which seat would you choose?", "Which one would you pick?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
 When they answer, call submit_page. Say one short sentence only, e.g. "Got it." Say nothing else."""
     else:
         return f"""You are facilitating the final round of a seat survey. Speak in English. Never speak more than 1 sentence per turn.
 
-Ask ONCE: "Which of these two seats would you go for, and what draws you to it?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+Ask ONCE which seat they'd prefer — vary the phrasing naturally, e.g. "Which of these two would you go for?", "Which seat would you choose?", "Which one appeals to you more?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
 When they answer, call submit_page. Say one short closing sentence only, e.g. "That's the last one — thanks!" Say nothing else."""
 
 
