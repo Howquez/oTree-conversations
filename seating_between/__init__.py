@@ -3,6 +3,7 @@ import boto3
 from botocore.config import Config as BotoConfig
 import os
 import httpx
+import itertools
 import random
 import hashlib
 import pandas as pd
@@ -11,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 doc = """
-Voice chat bot using OpenAI Realtime API — CSV-driven multi-round seat preference survey
+Voice chat bot using OpenAI Realtime API — between-subjects design (free vs. scripted response)
 """
 
 _STIMULI = (
@@ -32,6 +33,8 @@ _COL_LABEL = {
     'H': 'window seat on the right',
 }
 
+_SCRIPT = "either 'Please book Option A for me' or 'Please book Option B for me'"
+
 
 def _describe_seat(seat_id):
     row = int(seat_id[:-1])
@@ -42,16 +45,22 @@ def _describe_seat(seat_id):
     return ', '.join(parts)
 
 
-def _build_system_prompt(seat_a, seat_b, round_number, num_rounds):
+def _build_system_prompt(seat_a, seat_b, round_number, num_rounds, condition):
     if round_number == 1:
+        if condition == 'scripted':
+            step4 = f'Ask ONCE which seat they\'d like and specify the exact response format, e.g. "Which seat would you like? Please respond by saying {_SCRIPT}." Do not repeat this question.'
+            step5 = f'When they answer, call submit_page. Then say two sentences only, e.g. "For the next rounds I\'ll show you a new pair of seats. Please respond by saying {_SCRIPT}." Stop.'
+        else:
+            step4 = 'Ask ONCE: "Which of these two seats would you like?" or a natural variation, e.g. "Which one would you like me to book?" Do not repeat this question.'
+            step5 = 'When they answer, call submit_page. Then say two sentences only, e.g. "For the next rounds I\'ll show you a new pair of seats — just say which one you\'d like to book. Please speak in a full sentence." Stop.'
         return f"""You are a friendly voice assistant helping a passenger select their seat. Speak in English. Never speak more than 3 sentences in a single turn.
 
 Follow these steps strictly in order:
 1. Greet the user in one sentence only.
 2. Give a SHORT introduction. Then ask ONE brief warm-up question, e.g. "I'll be helping you pick your seat today — have you flown this route before?" Wait for their answer. Follow up in one sentence only. Then transition to the seat selection.
 3. Call show_seat_map immediately — say nothing before or after until the tool completes.
-4. Ask ONCE: "Which of these two seats would you like?" or a natural variation, e.g. "Which one would you like me to book?" Do not repeat this question.
-5. When they answer, call submit_page. Then say one sentence only, e.g. "For the next rounds I'll show you a new pair of seats — just say which one you'd like to book and please speak in a full sentence." Stop."""
+4. {step4}
+5. {step5}"""
     elif round_number < num_rounds:
         return f"""You are a voice assistant helping a passenger select their seat. This is round {round_number} of {num_rounds}. Speak in English. Never speak more than 1 sentence per turn.
 
@@ -65,7 +74,7 @@ When they answer, call submit_page. Say one short closing sentence only, e.g. "T
 
 
 class C(BaseConstants):
-    NAME_IN_URL = 'seating'
+    NAME_IN_URL = 'seating_between'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = len(_STIMULI)
 
@@ -79,6 +88,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    condition = models.StringField()
     chat_log = models.LongStringField(blank=True)
     choice_pair = models.IntegerField(blank=True)
     choice = models.StringField(blank=True)
@@ -96,7 +106,10 @@ class Player(BasePlayer):
 
 def creating_session(subsession):
     if subsession.round_number == 1:
-        for player in subsession.get_players():
+        players = subsession.get_players()
+        conditions = itertools.cycle(['free', 'scripted'])
+        for player, condition in zip(players, conditions):
+            player.participant.vars['condition'] = condition
             choices = list(_STIMULI)
             seed = int(hashlib.md5(player.participant.code.encode()).hexdigest(), 16)
             rng = random.Random(seed)
@@ -109,6 +122,10 @@ class Instructions(Page):
     def is_displayed(player: Player):
         return player.round_number == 1
 
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(condition=player.participant.vars.get('condition', 'free'))
+
 
 class record(Page):
     form_model = 'player'
@@ -119,9 +136,12 @@ class record(Page):
     def vars_for_template(player: Player):
         current = player.participant.vars['choices'][player.round_number - 1]
         player.choice_pair = int(current['pair_id'])
+        condition = player.participant.vars.get('condition', 'free')
+        player.condition = condition
         return dict(
             seat_A=current['seat_A'],
             seat_B=current['seat_B'],
+            condition=condition,
         )
 
     @staticmethod
@@ -132,11 +152,13 @@ class record(Page):
             try:
                 OPENAI_KEY = os.environ.get('WHISPER_KEY')
                 current = player.participant.vars['choices'][player.round_number - 1]
+                condition = player.participant.vars.get('condition', 'free')
                 system_prompt = _build_system_prompt(
                     seat_a=current['seat_A'],
                     seat_b=current['seat_B'],
                     round_number=player.round_number,
                     num_rounds=C.NUM_ROUNDS,
+                    condition=condition,
                 )
 
                 async with httpx.AsyncClient() as client:
@@ -148,7 +170,7 @@ class record(Page):
                         },
                         json={
                             'model': 'gpt-realtime-1.5',
-                            'voice': 'cedar', # or 'marin" as suggested here: https://developers.openai.com/api/docs/guides/realtime-conversations/#voice-options
+                            'voice': 'cedar',
                             'instructions': system_prompt,
                             'input_audio_transcription': {
                                 'model': 'whisper-1',
@@ -184,7 +206,8 @@ class record(Page):
 
         elif msg_type == 'upload_url':
             try:
-                filename = f"{player.session.code}_{player.participant.code}_seating_r{player.round_number}.webm"
+                condition = player.participant.vars.get('condition', 'free')
+                filename = f"{player.session.code}_{player.participant.code}_seating_between_{condition}_r{player.round_number}.webm"
                 s3_client = boto3.client('s3',
                     aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
                     aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),

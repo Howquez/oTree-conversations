@@ -7,11 +7,18 @@
 
 <div class="chat-container">
     <h1 class="chat-title" id="page-title" style="visibility: hidden;">Which seat would you like me to book for you?</h1>
+    {{ if player.round_number > 1 }}
+        {{ if condition == 'scripted' }}
+            <p class="text-center text-muted small mt-2">
+                Please respond by saying <code>"Please book Option [A/B] for me"</code>.
+            </p>
+        {{ endif }}
+    {{ endif }}
     <p class="text-muted small mb-0">Round {{ player.round_number }} of {{ C.NUM_ROUNDS }}</p>
 
     {{ if player.round_number == 1 }}
     <div class="instructions" id="instructions">
-        <p>You'll have a short voice conversation about seat preferences.</p>
+        <p>You'll have a short voice conversation about seat selection.</p>
         <p>Click the microphone button below, then say "Hello" to begin the conversation.</p>
     </div>
     {{ endif }}

@@ -42,7 +42,7 @@ def _build_system_prompt(discount_seat_label, round_number, num_rounds):
     bridging = "Got it — one more coming up." if round_number < num_rounds else "That's it — thanks! Let's move on to a short survey."
     return f"""You are facilitating a seat discount question. Speak in English. Never speak more than 1 sentence per turn.
 
-Ask ONCE: "Seat {discount_seat_label} is now ${_DISCOUNT_AMOUNT} cheaper — would you switch, or stick with your original choice, and why?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
+Ask ONCE: "Seat {discount_seat_label} is now ${_DISCOUNT_AMOUNT} cheaper — would you switch to it, or keep your original choice?" Then stop — the seat map will appear automatically. Wait silently for the participant to respond.
 When they answer, call submit_page. Then say: "{bridging}" Say nothing else."""
 
 

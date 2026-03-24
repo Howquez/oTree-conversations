@@ -1,0 +1,60 @@
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'css/seating.css' }}">
+<link rel="stylesheet" href="{{ static 'global/css/flight_card.css' }}">
+{{ endblock }}
+
+{{ block scripts }}
+<script src="{{ static 'global/js/instructions.js' }}"></script>
+{{ endblock }}
+
+{{ block content }}
+
+<div class="container-fluid p-0 m-0">
+    <div class="row p-0 m-0 justify-content-center">
+
+        <div class="col-12 col-lg-7 col-md-9 p-3 mt-4 mb-5">
+
+            <div class="card shadow px-4 py-3 border-0 mb-3">
+
+                <h5>Seat Selection Task</h5>
+
+                <p>
+                    Imagine you have just booked the flight shown below for a <strong>private trip</strong>. You have reached the seat-selection step, where a voice assistant will help you choose your seat.
+                </p>
+
+                <p>
+                    Please assume that the flight will be fully booked: every seat of that airplane will be occupied by another passenger.
+                </p>
+
+                {{ if condition == 'scripted' }}
+                <p>
+                    The assistant will show you {{ C.NUM_ROUNDS }} pairs of seats. <strong>For each pair, respond by saying exactly the following sentence:</strong><br>
+                    <code>"Please book Option [A/B] for me."</code>
+                </p>
+                {{ else }}
+                <p>
+                    The assistant will show you {{ C.NUM_ROUNDS }} pairs of seats. <strong>For each pair, say out loud which of the two seats you would like the assistant to book for you.</strong>
+                    For instance: "I'll take Seat A" or "Please book Option B for me."
+                </p>
+                {{ endif }}
+
+                <p>
+                    When you are ready, click the microphone button on the next page and say <strong>"Hello"</strong> to start.
+                </p>
+
+                <div class="d-flex justify-content-center mt-3 mb-2">
+                    <button class="btn btn-outline-secondary shadow" type="submit" id="submit_button">
+                        Continue
+                    </button>
+                </div>
+
+            </div>
+
+            {% include 'global/flight_card.html' %}
+
+        </div>
+
+    </div>
+</div>
+
+{{ endblock }}

@@ -2,17 +2,28 @@ from os import environ
 
 SESSION_CONFIGS = [
     dict(
-        name='seat_preference',
-        app_sequence=['onboarding', 'seating', 'seating_discount', 'seating_slider', 'seating_discount_slider', 'outro'],
+        name='seat_preferences',
+        app_sequence=['onboarding', 'seating', 'seating_slider', 'outro'],
         num_demo_participants=3,
     ),
     dict(
-        name='seat_preference_short',
-        app_sequence=['onboarding',
-                      'seating', 'seating_discount',
+        name='seat_discounts',
+        app_sequence=['onboarding', 'seating', 'seating_discount', 'seating_slider', 'seating_discount_slider',
                       'outro'],
         num_demo_participants=3,
     ),
+    dict(
+        name='seat_scripted',
+        app_sequence=['onboarding', 'seating_between', 'seating_slider', 'outro'],
+        num_demo_participants=3,
+    ),
+    # dict(
+    #     name='seat_preference_short',
+    #     app_sequence=['onboarding',
+    #                   'seating', 'seating_discount',
+    #                   'outro'],
+    #     num_demo_participants=3,
+    # ),
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
